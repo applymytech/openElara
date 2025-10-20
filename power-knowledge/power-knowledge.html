@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Knowledge - OpenElara</title>
+    <link rel="stylesheet" href="../assets/styles/style.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1d3a 0%, #2d1b3d 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            color: #e0e0e0;
+            overflow-y: auto;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        
+        .main-content {
+            min-height: calc(100vh - 40px);
+            padding-bottom: 50px; /* Buffer space at the bottom */
+        }
+
+        .knowledge-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(30, 30, 30, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        h1 {
+            text-align: center;
+            color: #a78bfa;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #a0a0a0;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        .tool-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .tab-navigation {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #333;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: #888;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            color: #a78bfa;
+        }
+
+        .tab-btn.active {
+            color: #a78bfa;
+            border-bottom-color: #a78bfa;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section {
+            background: #252525;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            color: #a78bfa;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .command-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .command-btn {
+            padding: 15px;
+            background: #1a1a1a;
+            border: 2px solid #333;
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .command-btn:hover {
+            background: #2a2a2a;
+            border-color: #a78bfa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(167, 139, 250, 0.3);
+        }
+
+        .command-btn.selected {
+            background: rgba(167, 139, 250, 0.2);
+            border-color: #a78bfa;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        label {
+            display: block;
+            color: #b0b0b0;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 0.95em;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: 'Consolas', 'Courier New', monospace;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #a78bfa;
+            box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.2);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #a78bfa;
+            color: #1a1a1a;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #8b5cf6;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(167, 139, 250, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #555;
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: #666;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .info-box {
+            background: rgba(96, 165, 250, 0.1);
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+
+        .info-box strong {
+            color: #60a5fa;
+        }
+
+        .query-details {
+            display: none;
+        }
+
+        .query-details.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .log-output {
+            background: #1a1a1a;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.85em;
+            display: none;
+        }
+
+        .log-output.active {
+            display: block;
+        }
+
+        .log-entry {
+            padding: 6px 0;
+            border-bottom: 1px solid #2a2a2a;
+            color: #b0b0b0;
+            line-height: 1.5;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-entry.success {
+            color: #10b981;
+        }
+
+        .log-entry.error {
+            color: #ef4444;
+        }
+
+        .log-entry.info {
+            color: #60a5fa;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: #a78bfa;
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #8b5cf6;
+        }
+
+        .results-container {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .result-item {
+            padding: 15px;
+            background: #252525;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            transition: background 0.2s;
+        }
+
+        .result-item:hover {
+            background: #2a2a2a;
+        }
+
+        .result-title {
+            color: #a78bfa;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.05em;
+        }
+
+        .result-url {
+            color: #888;
+            font-size: 0.85em;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .result-url:hover {
+            color: #a78bfa;
+        }
+
+        .result-score {
+            color: #60a5fa;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .log-output::-webkit-scrollbar,
+        .results-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .log-output::-webkit-scrollbar-track,
+        .results-container::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 4px;
+        }
+
+        .log-output::-webkit-scrollbar-thumb,
+        .results-container::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
+        }
+
+        .log-output::-webkit-scrollbar-thumb:hover,
+        .results-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .selected-command-title {
+            display: none;
+            color: #888;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #1a1a1a;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .selected-command-title.active {
+            display: block;
+        }
+
+        .selected-command-title strong {
+            color: #a78bfa;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-content">
+        <div class="knowledge-container">
+            <a href="#" id="back-link" class="back-link">← Back to Main App</a>
+        
+        <div style="text-align: center;">
+            <span class="tool-badge">POWERED BY EXA.AI</span>
+        </div>
+        <h1>🧠 Power Knowledge</h1>
+        <p class="subtitle">Neural web search and research powered by Exa.ai</p>
+
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button id="tab-simple" class="tab-btn active">Simple Query</button>
+            <button id="tab-advanced" class="tab-btn">Advanced Research</button>
+        </div>
+
+        <!-- Simple Query Tab -->
+        <div id="simple-panel" class="tab-panel active">
+            <div class="section">
+                <div class="section-title">
+                    <span>🔍</span>
+                    <span>Select Query Type</span>
+                </div>
+
+                <div class="info-box">
+                    <strong>Quick Actions:</strong> Choose a query type below and execute instantly. 
+                    Results can be displayed in chat, saved to file, or both.
+                </div>
+
+                <div class="command-grid">
+                    <button class="command-btn" data-task="search">
+                        <span>🔍</span>
+                        <span>Power Search</span>
+                    </button>
+                    <button class="command-btn" data-task="crawl">
+                        <span>📖</span>
+                        <span>Power Read</span>
+                    </button>
+                    <button class="command-btn" data-task="similar">
+                        <span>🔗</span>
+                        <span>Power Similar</span>
+                    </button>
+                    <button class="command-btn" data-task="answer">
+                        <span>💡</span>
+                        <span>Power Answer</span>
+                    </button>
+                </div>
+
+                <div id="query-details" class="query-details">
+                    <div class="selected-command-title" id="selected-command-title">
+                        Selected: <strong id="selected-command-name"></strong>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="query-input">Query or URL</label>
+                        <input type="text" id="query-input" placeholder="Enter your query or URL...">
+                    </div>
+
+                    <!-- LiveCrawl Option -->
+                    <div id="livecrawl-group" class="form-group" style="display: none;">
+                        <label for="livecrawl-select">Content Freshness</label>
+                        <select id="livecrawl-select" style="width: 100%; padding: 12px; background: #1a1a1a; border: 1px solid #444; border-radius: 6px; color: #e0e0e0; font-size: 0.95em; box-sizing: border-box; font-family: inherit;">
+                            <option value="never">⚡ Fast (Use Cached)</option>
+                            <option value="fallback" selected>⚖️ Balanced (Cache First)</option>
+                            <option value="preferred">🔄 Fresh (Try Live)</option>
+                            <option value="always">🌟 Live (Always Fresh)</option>
+                        </select>
+                        <small style="color: #888; font-size: 0.8em; margin-top: 5px; display: block;">
+                            Choose how fresh you want the content to be. "Live" options get current web content but may be slower.
+                        </small>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button id="execute-btn" class="btn btn-primary">Execute</button>
+                        <button id="clear-simple-btn" class="btn btn-secondary">Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="simple-results" class="results-container" style="display: none;">
+            </div>
+        </div>
+
+        <!-- Advanced Research Tab -->
+        <div id="advanced-panel" class="tab-panel">
+            <div class="section">
+                <div class="section-title">
+                    <span>🔬</span>
+                    <span>Deep Research Configuration</span>
+                </div>
+
+                <div class="info-box">
+                    <strong>Advanced Research:</strong> Performs multi-source analysis with LLM summarization. 
+                    Configure filters and parameters for targeted research. Results save to Output/exa/ folder.
+                    <br><br>
+                    <strong>Note:</strong> Research tasks may take up to 25 minutes to complete. 
+                    You can continue chatting with the AI while research runs in the background.
+                </div>
+
+                <div class="form-group">
+                    <label for="research-query">Research Query</label>
+                    <textarea id="research-query" placeholder="What are the latest developments in quantum computing as of 2024?"></textarea>
+                </div>
+
+                <div class="form-group-row">
+                    <div class="form-group">
+                        <label for="num-results">Number of Results</label>
+                        <input type="number" id="num-results" min="1" max="10" value="5">
+                    </div>
+                    <div class="form-group">
+                        <label for="start-date">Start Date (Optional)</label>
+                        <input type="date" id="start-date">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="include-domains">Include Domains (comma-separated)</label>
+                    <input type="text" id="include-domains" placeholder="e.g., wikipedia.org, nature.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="exclude-domains">Exclude Domains (comma-separated)</label>
+                    <input type="text" id="exclude-domains" placeholder="e.g., reddit.com, twitter.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="research-model">Research Model</label>
+                    <select id="research-model" style="width: 100%; padding: 12px; background: #1a1a1a; border: 1px solid #444; border-radius: 6px; color: #e0e0e0; font-size: 0.95em; box-sizing: border-box; font-family: inherit;">
+                        <option value="exa-research" selected>🧠 Exa Research (Adaptive)</option>
+                        <option value="exa-research-pro">⭐ Exa Research Pro (Maximum Quality)</option>
+                        <option value="exa">🔍 Exa (Fast & Balanced)</option>
+                    </select>
+                    <small style="color: #888; font-size: 0.8em; margin-top: 5px; display: block;">
+                        Choose the AI model for research. Pro model provides highest quality but takes longer.
+                    </small>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="research-execute-btn" class="btn btn-primary">Execute Research</button>
+                    <button id="clear-advanced-btn" class="btn btn-secondary">Clear</button>
+                </div>
+            </div>
+            <div id="research-log" class="log-output">
+            </div>
+        </div>
+    </div>
+
+    <script src="power-knowledge.js"></script>
+</div> <!-- main-content -->
+    </body>
+
+</html>

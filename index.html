@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: file:; media-src 'self' file:; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net   https://cdnjs.cloudflare.com  ; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net  ; connect-src 'self' https://cdn.jsdelivr.net  ;">
+    <title>openElara</title>
+    <link rel="stylesheet" href="assets/styles/style.css" />
+    <link rel="stylesheet" href="assets/styles/objectStyles.css" />
+    <link rel="stylesheet" href="src/components/QuickInsert.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/atom-one-dark.min.css  ">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js  "></script>
+    <script>hljs.highlightAll();</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body class="theme-active">
+    <div id="chat-container">
+        <div id="status-bar" class="hidden"></div>
+
+        <div id="top-clusters-container">
+            <details id="context-canvas-details" class="token-manager-collapsible">
+                <summary class="token-manager-summary">
+                    Context Canvas: <span id="canvas-summary-text">None</span> (<span id="canvas-summary-tokens">0</span> tokens)
+                </summary>
+                <div class="token-allocator-container" id="canvas-display-area">
+                    <div id="context-files-list">None</div>
+                </div>
+            </details>
+
+            <details class="token-manager-collapsible">
+                    <summary class="token-manager-summary">Model: <span id="model-display-name">...</span></summary>
+                    <div class="token-allocator-container">
+                        <select name="models" id="model-select">
+                        </select>
+                    </div>
+                </details>
+
+                <details class="token-manager-collapsible">
+                    <summary class="token-manager-summary">Personality Modifier: <span id="personality-display-name">...</span></summary>
+                    <div class="token-allocator-container">
+                        <select name="personalities" id="personality-select">
+                            </select>
+                    <button id="manage-personalities-btn" class="file-btn" style="margin-top: 10px;">Manage Modifiers</button>
+                    </div>
+                </details>
+                    <details id="token-allocations-details" class="token-manager-collapsible">
+                        <summary class="token-manager-summary">Thought Allocation</summary>
+                        <div class="token-allocator-container">
+                            <div class="token-reset-buttons">
+                                <button id="reset-all-btn" class="file-btn">Reset All</button>
+                                <button id="reset-input-btn" class="file-btn">Reset Inputs</button>
+                                <button id="reset-output-btn" class="file-btn">Reset Output</button>
+                            </div>
+                            <div class="token-allocator">
+                                <label for="knowledge-rag-slider">Knowledge Base</label>
+                                <input type="range" id="knowledge-rag-slider" min="128" step="128">
+                                <input type="number" id="knowledge-rag-input" min="128" step="128">
+                            </div>
+                            <div class="token-allocator">
+                                <label for="history-rag-slider">Chat History</label>
+                                <input type="range" id="history-rag-slider" min="128" step="128">
+                                <input type="number" id="history-rag-input" min="128" step="128">
+                            </div>
+                            <hr class="token-divider">
+                            <div class="token-allocator">
+                                <label for="output-limit-slider">Response Size</label>
+                                <input type="range" id="output-limit-slider" min="256" step="256">
+                                <input type="number" id="output-limit-input" min="256" step="256">
+                            </div>
+                        </div>
+                    </details>
+                </div>
+                <div class="model-context-stats">
+                    <span>Total Thinking Power: <strong id="model-context-window">...</strong></span>
+                    <span>System Reserve: <strong id="system-reserve">...</strong></span>
+                    <span>Total User Budget: <strong id="total-user-budget">...</strong></span><br>
+                    <span id="model-cost-display">Cost: N/A</span>
+                    <span id="send-cost-display">| Send Cost: <span id="send-cost-tokens">~0 </span><span id="send-cost-usd">(~$0.000000)</span></span>
+                </div>
+            </div>
+        </div>
+        
+        <div id="main-content-container">
+
+            <div id="sidebar">
+                <div class="sidebar-section collapsible">
+                    <h4 class="sidebar-section-header">⚙️ Settings & Account <span class="collapse-icon">▼</span></h4>
+                    <div class="sidebar-section-content">
+                        <button id="account-btn" class="sidebar-btn">Account Settings</button>
+                        <div id="theme-controls-container-sidebar">
+                            <button id="theme-btn" class="sidebar-btn" title="Open Theme Settings">Theme</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section collapsible collapsed">
+                    <h4 class="sidebar-section-header">📝 Content Tools <span class="collapse-icon">▶</span></h4>
+                    <div class="sidebar-section-content">
+                        <button id="action-manager-btn" class="sidebar-btn" title="Manage and insert actions">Action Manager</button>
+                        <button id="prompt-manager-btn" class="sidebar-btn" title="Manage and insert reusable prompts">Prompt Manager</button>
+                    </div>
+                </div>
+
+                <div class="sidebar-section collapsible collapsed">
+                    <h4 class="sidebar-section-header">📎 Context & Files <span class="collapse-icon">▶</span></h4>
+                    <div class="sidebar-section-content">
+                        <button id="attach-file-btn" class="sidebar-btn" title="Attach a single file to the next message">Attach File</button>
+                        <button id="create-object-btn" class="sidebar-btn" title="Create a custom text/code object for the LLM">Custom Object</button>
+                        <button id="add-to-canvas-btn" class="sidebar-btn" title="Add file(s) to the persistent Context Canvas">Add to Canvas</button>
+                        <button id="clear-canvas-btn" class="sidebar-btn" title="Clear all files from the Context Canvas">Clear Canvas</button>
+                    </div>
+                </div>
+                
+                <div class="sidebar-section collapsible collapsed">
+                    <h4 class="sidebar-section-header">📚 Knowledge Base <span class="collapse-icon">▶</span></h4>
+                    <div class="sidebar-section-content">
+                        <button id="ingest-files-btn" class="sidebar-btn" title="Ingest new files into the knowledge base">Ingest Files</button>
+                        <button id="ingest-folder-btn" class="sidebar-btn" title="Ingest all files from a folder">Ingest Folder</button>
+                        <button id="view-knowledge-files-btn" class="sidebar-btn" title="View files in the knowledge base (for deletion)">View & Manage KB</button>
+                        <button id="clear-knowledge-btn" class="sidebar-btn btn-danger-outline" title="Forget all data in the knowledge base">Forget All KB</button>
+                    </div>
+                </div>
+
+                <div class="sidebar-section collapsible collapsed">
+                    <h4 class="sidebar-section-header">🧠 Chat Memories <span class="collapse-icon">▶</span></h4>
+                    <div class="sidebar-section-content">
+                        <button id="view-history-btn" class="sidebar-btn" title="View full chat session history">View Session History</button>
+                        <button id="view-memories-btn" class="sidebar-btn" title="View long-term chat memories (RAG DB)">View & Manage Memories</button>
+                        <button id="clear-history-btn" class="sidebar-btn btn-danger-outline" title="Clear all chat history and memories">Forget All Memories</button>
+                        <button id="show-thinking-btn" class="sidebar-btn" title="Show last AI thought process">Show Reasoning</button>
+                    </div>
+                </div>
+
+                <div class="sidebar-section collapsible collapsed">
+                    <h4 class="sidebar-section-header">🔍 Research Tools <span class="collapse-icon">▶</span></h4>
+                    <div class="sidebar-section-content">
+                        <button id="slash-command-btn" class="sidebar-btn" title="Run Exa.ai web research">Power Knowledge</button>
+                        <button id="power-scrape-btn" class="sidebar-btn" title="Run the Scrapy web scraping suite">Power Scrape</button>
+                    </div>
+                </div>
+
+                <div class="sidebar-section collapsible collapsed">
+                    <h4 class="sidebar-section-header">🎨 Generation <span class="collapse-icon">▶</span></h4>
+                    <div class="sidebar-section-content">
+                        <button id="generate-selfie-btn" class="sidebar-btn" title="Generate a selfie image of Elara">Generate Selfie</button>
+                        <button id="generate-image-btn" class="sidebar-btn" title="Open the advanced Image Generation tool">Advanced Image Gen</button>
+                        <button id="generate-selfie-video-btn" class="sidebar-btn" title="Generate a video scene with Elara">Generate Selfie Video</button>
+                        <button id="generate-advanced-video-btn" class="sidebar-btn" title="Open the advanced Video Generation tool">Advanced Video Gen</button>
+                        <button id="open-deepai-studio-btn" class="sidebar-btn" title="Open the DeepAI Studio for advanced AI tools">🧠 DeepAI Studio</button>
+                        <button id="sign-content-btn" class="sidebar-btn" title="Digitally sign and certify your generated content">🔐 Sign Content</button>
+                    </div>
+                </div>
+                
+                <div class="sidebar-section collapsible collapsed">
+                    <h4 class="sidebar-section-header">🔄 File Conversion <span class="collapse-icon">▶</span></h4>
+                    <div class="sidebar-section-content">
+                        <button id="open-file-converter-btn" class="sidebar-btn" title="Open the File Converter Suite">File Converter</button>
+                    </div>
+                </div>
+                
+                <div class="sidebar-section collapsible collapsed">
+                    <h4 class="sidebar-section-header">📁 Output Folders <span class="collapse-icon">▶</span></h4>
+                    <div class="sidebar-section-content" style="display: none;">
+                        <button id="open-output-folder-btn" class="sidebar-btn" title="Open the root folder for all generated output">Open Root Output</button>
+                        <button id="open-images-folder-btn" class="sidebar-btn" title="Open the folder for generated images">Open Images Folder</button>
+                        <button id="open-videos-folder-btn" class="sidebar-btn" title="Open the folder for generated videos">Open Videos Folder</button>
+                        <button id="open-conversions-folder-btn" class="sidebar-btn" title="Open the folder for file conversions">Open Conversions Folder</button>
+                        <button id="open-exa-folder-btn" class="sidebar-btn" title="Open the folder for Exa.ai research results">Open Exa Folder</button>
+                        <button id="open-scrapy-folder-btn" class="sidebar-btn" title="Open the folder for Scrapy scraping results">Open Scrapy Folder</button>
+                        <button id="clear-all-output-btn" class="sidebar-btn btn-danger-outline" title="Clear all files from all output sub-folders">Clear All Output</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="chat-main-area">
+                <div id="chat-history"></div>
+
+                <div id="chat-input-area">
+                    <div id="file-buttons-container" class="hidden">
+                        <div class="right-aligned-buttons">
+                            <div id="attached-file-display" class="hidden"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="keyboard-shortcut-container">
+                        <input type="checkbox" id="ctrl-enter-toggle" checked>
+                        <label for="ctrl-enter-toggle">Ctrl + Enter to Send</label>
+                    </div>
+                    <form id="chat-form">
+                        <span id="input-token-estimate">0</span> tokens
+                        <button type="button" id="insert-text-object-btn" class="btn-secondary" style="padding: 6px 10px; font-size: 12px; margin-left: 10px;" title="Insert text as an object (Ctrl+Shift+O)">📦 Object</button>
+                        <div id="chat-input" class="chat-input-div" contenteditable="true" placeholder="If this is your first chat then attach the user manual and ask the AI to help you get started" required></div>
+                        <button type="submit" style="padding: 12px 24px; font-size: 14px;">Send</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="theme-settings-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Theme Settings</h3>
+            <div class="form-group">
+                <label>Mode:</label>
+                <div class="theme-controls-modal">
+                    <button id="theme-toggle-modal-btn" class="btn-secondary" title="Toggle Light/Dark Mode">🌓 Toggle Light/Dark</button>
+                </div>
+            </div>
+            <hr>
+            <div class="form-group">
+                <label>Customization:</label>
+                <p>Use the color picker to generate a custom palette based on your chosen color.</p>
+                <button id="theme-color-modal-btn" class="btn-primary" title="Choose Custom Theme Color">🎨 Generate Custom Theme</button>
+            </div>
+            <hr>
+            <div class="form-group">
+                <label>Reset:</label>
+                <button id="theme-reset-modal-btn" class="btn-secondary" title="Reset to Default Theme">🔄️ Reset to Default Theme</button>
+            </div>
+            <div class="modal-buttons" style="margin-top: 20px;">
+                <button id="close-theme-settings-btn" class="btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="ingestion-overlay" class="hidden">
+        <div id="ingestion-log-container">
+            <h3>Ingesting Knowledge...</h3>
+            <div id="ingestion-log"></div>
+            <div id="ingestion-close-container"></div>
+        </div>
+    </div>
+
+    <div id="manage-personalities-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Manage Personality Modifiers</h3>
+            <div id="personalities-list">
+            </div>
+            <button id="add-personality-btn" class="btn-primary">Add New Modifier</button>
+            <button id="close-manage-personalities-btn" class="btn-secondary">Close</button>
+        </div>
+    </div>
+
+    <div id="add-edit-personality-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3 id="modal-title">Add New Modifier</h3>
+            <div class="form-group">
+                <label for="personality-name">Name</label>
+                <input type="text" id="personality-name" required>
+            </div>
+            <div class="form-group">
+                <label for="personality-text">Modifier Text (Instructions for the AI)</label>
+                <textarea id="personality-text" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="token-limit">Size Limit (Max: 2048)</label>
+                <input type="number" id="token-limit" min="1" max="2048" required>
+            </div>
+            <button id="save-personality-btn" class="btn-primary">Save</button>
+            <button id="cancel-personality-btn" class="btn-secondary">Cancel</button>
+        </div>
+    </div>
+
+    <div id="color-picker-modal" class="hidden">
+        <div class="modal-content">
+            <div id="color-picker-ui">
+                <h3>Select a Base Color</h3>
+                <p>The AI will generate a full theme from your selection. Click the color block below to make a selection...</p>
+                <div class="modal-buttons">
+                    <button id="color-picker-confirm-btn" class="btn-primary">Confirm</button>
+                    <button id="color-picker-cancel-btn" class="btn-secondary">Cancel</button>
+                </div>
+                <div class="color-picker-container">
+                    <input type="color" id="color-picker-input" value="#4A90E2">
+                </div>
+            </div>
+            <div id="theme-log-container" class="hidden">
+                <h3>Generating AI Theme...</h3>
+                <div id="theme-log"></div>
+                <div class="modal-buttons">
+                    <button id="theme-log-close-btn" class="btn-secondary hidden">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="create-object-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Create Custom Object</h3>
+            <p>Paste any text, code, or data below. It will be sent as a separate object to the LLM.</p>
+            <textarea id="object-input-textarea" class="modal-textarea" placeholder="Paste your text, code, JSON, or any content here..."></textarea>
+            <div class="modal-buttons">
+                <button id="insert-object-btn" class="btn-primary">Insert Custom Object</button>
+                <button id="cancel-object-btn" class="btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="manage-prompts-modal" class="modal hidden">
+    <div class="modal-content">
+        <h3>Manage Prompts</h3>
+        <div id="prompts-list">
+            </div>
+        <button id="add-prompt-btn" class="btn-primary">Add New Prompt</button>
+        <button id="close-manage-prompts-btn" class="btn-secondary">Close</button>
+    </div>
+</div>
+
+<div id="add-edit-prompt-modal" class="modal hidden">
+    <div class="modal-content" style="max-width: 700px;">
+        <h3 id="prompt-modal-title">Add New Prompt</h3>
+        <div class="form-group">
+            <label for="prompt-type-select">Prompt Type</label>
+            <select id="prompt-type-select">
+                <option value="chat">💬 Chat / Text Generation</option>
+                <option value="image">🖼️ Image Generation</option>
+                <option value="video">🎬 Video Generation</option>
+                <option value="modifier">🔧 Modifier</option>
+            </select>
+        </div>
+        <div id="chat-prompt-container" class="prompt-type-container">
+            <div class="tab-container">
+                <button id="tab-chat-free" class="tab-btn active" data-tab="chat-free">Free Text</button>
+                <button id="tab-chat-template" class="tab-btn" data-tab="chat-template">Template</button>
+            </div>
+
+            <div id="chat-free-content" class="tab-content active">
+                <div class="form-group">
+                    <label for="chat-free-name">Prompt Name</label>
+                    <input type="text" id="chat-free-name" placeholder="e.g., 'Research Assistant'">
+                </div>
+                <div class="form-group">
+                    <label for="chat-free-text">Prompt Text</label>
+                    <textarea id="chat-free-text" class="modal-textarea" placeholder="Enter your full prompt here..."></textarea>
+                </div>
+            </div>
+
+            <div id="chat-template-content" class="tab-content hidden">
+                <div class="form-group">
+                    <label for="chat-template-name">Prompt Name</label>
+                    <input type="text" id="chat-template-name" placeholder="e.g., 'Summarize Meeting Notes'">
+                </div>
+                <div class="form-group">
+                    <label for="chat-template-role">Role</label>
+                    <input type="text" id="chat-template-role" placeholder="e.g., 'A helpful executive assistant'">
+                </div>
+                <div class="form-group">
+                    <label for="chat-template-instruction">Instruction</label>
+                    <textarea id="chat-template-instruction" placeholder="e.g., 'You are to summarize the key decisions and action items.'"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="chat-template-data">Data Source</label>
+                    <input type="text" id="chat-template-data" placeholder="e.g., 'You are to use the attached file.'">
+                </div>
+                <div class="form-group">
+                    <label for="chat-template-output">Output Format</label>
+                    <input type="text" id="chat-template-output" placeholder="e.g., 'You are to provide a bulleted list in markdown format.'">
+                </div>
+            </div>
+        </div>
+
+        <div id="image-prompt-container" class="prompt-type-container hidden">
+            <div class="tab-container">
+                <button id="tab-image-free" class="tab-btn active" data-tab="image-free">Free Text</button>
+                <button id="tab-image-structured" class="tab-btn" data-tab="image-structured">Structured</button>
+            </div>
+
+            <div id="image-free-content" class="tab-content active">
+                <div class="form-group">
+                    <label for="image-free-name">Prompt Name</label>
+                    <input type="text" id="image-free-name" placeholder="e.g., 'Cyberpunk Portrait'">
+                </div>
+                <div class="form-group">
+                    <label for="image-free-text">Full Image Prompt</label>
+                    <textarea id="image-free-text" class="modal-textarea" placeholder="Describe the complete image you want to generate..."></textarea>
+                </div>
+            </div>
+
+            <div id="image-structured-content" class="tab-content hidden">
+                <div class="form-group">
+                    <label for="image-struct-name">Prompt Name</label>
+                    <input type="text" id="image-struct-name" placeholder="e.g., 'Professional Portrait'">
+                </div>
+                <div class="form-group">
+                    <label for="image-struct-character">Character Description</label>
+                    <input type="text" id="image-struct-character" placeholder="Leave blank to use active character, or describe a different character">
+                    <small>Tip: Leave blank to automatically use the active character's description</small>
+                </div>
+                <div class="form-group">
+                    <label for="image-struct-scene">Scene / Environment</label>
+                    <input type="text" id="image-struct-scene" placeholder="e.g., 'modern office with large windows'">
+                </div>
+                <div class="form-group">
+                    <label for="image-struct-action">Action / Pose</label>
+                    <input type="text" id="image-struct-action" placeholder="e.g., 'sitting at desk, looking at camera with confident smile'">
+                </div>
+                <div class="form-group">
+                    <label for="image-struct-attire">Attire / Clothing</label>
+                    <input type="text" id="image-struct-attire" placeholder="e.g., 'business casual, blue blazer'">
+                </div>
+                <div class="form-group">
+                    <label for="image-struct-effects">Effects / Technical</label>
+                    <input type="text" id="image-struct-effects" placeholder="e.g., 'soft lighting, shallow depth of field, photorealistic'">
+                </div>
+                <div class="form-group">
+                    <label for="image-struct-style">Art Style</label>
+                    <input type="text" id="image-struct-style" placeholder="e.g., 'professional photography, corporate headshot'">
+                </div>
+            </div>
+        </div>
+
+        <div id="video-prompt-container" class="prompt-type-container hidden">
+            <div class="tab-container">
+                <button id="tab-video-free" class="tab-btn active" data-tab="video-free">Free Text</button>
+                <button id="tab-video-structured" class="tab-btn" data-tab="video-structured">Structured</button>
+            </div>
+
+            <div id="video-free-content" class="tab-content active">
+                <div class="form-group">
+                    <label for="video-free-name">Prompt Name</label>
+                    <input type="text" id="video-free-name" placeholder="e.g., 'Dynamic Action Shot'">
+                </div>
+                <div class="form-group">
+                    <label for="video-free-text">Full Video Prompt</label>
+                    <textarea id="video-free-text" class="modal-textarea" placeholder="Describe the complete video you want to generate..."></textarea>
+                </div>
+            </div>
+
+            <div id="video-structured-content" class="tab-content hidden">
+                <div class="form-group">
+                    <label for="video-struct-name">Prompt Name</label>
+                    <input type="text" id="video-struct-name" placeholder="e.g., 'Character Introduction'">
+                </div>
+                <div class="form-group">
+                    <label for="video-struct-character">Character Description</label>
+                    <input type="text" id="video-struct-character" placeholder="Leave blank to use active character, or describe a different character">
+                    <small>Tip: Leave blank to automatically use the active character's description</small>
+                </div>
+                <div class="form-group">
+                    <label for="video-struct-scene">Scene / Environment</label>
+                    <input type="text" id="video-struct-scene" placeholder="e.g., 'modern minimalist setting with soft lighting'">
+                </div>
+                <div class="form-group">
+                    <label for="video-struct-action">Action / Movement</label>
+                    <input type="text" id="video-struct-action" placeholder="e.g., 'turning to face camera and waving hello'">
+                </div>
+                <div class="form-group">
+                    <label for="video-struct-attire">Attire / Clothing</label>
+                    <input type="text" id="video-struct-attire" placeholder="e.g., 'casual but polished outfit'">
+                </div>
+                <div class="form-group">
+                    <label for="video-struct-effects">Effects / Lighting</label>
+                    <input type="text" id="video-struct-effects" placeholder="e.g., 'natural lighting, professional cinematography'">
+                </div>
+                <div class="form-group">
+                    <label for="video-struct-camera">Camera Movement</label>
+                    <input type="text" id="video-struct-camera" placeholder="e.g., 'slow dolly forward, tracking shot'">
+                </div>
+                <div class="form-group">
+                    <label for="video-struct-duration">Duration Guidance</label>
+                    <input type="text" id="video-struct-duration" placeholder="e.g., '3-5 seconds, short loop'">
+                </div>
+            </div>
+        </div>
+
+        <div id="modifier-prompt-container" class="prompt-type-container hidden">
+            <div class="form-group">
+                <label for="modifier-name">Modifier Name</label>
+                <input type="text" id="modifier-name" placeholder="e.g., 'Keep Response Brief'">
+            </div>
+            <div class="form-group">
+                <label for="modifier-text">Modifier Text</label>
+                <textarea id="modifier-text" class="modal-textarea" placeholder="Enter the modifier instruction..."></textarea>
+            </div>
+        </div>
+        <input type="hidden" id="editing-prompt-id" />
+             <button id="save-prompt-btn" class="btn-primary">Save Prompt</button>
+             <button id="cancel-prompt-btn" class="btn-secondary">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div id="manage-actions-modal" class="modal hidden"> 
+    <div class="modal-content">
+        <h3>Manage Actions</h3>
+        <div id="actions-list"> 
+        </div>
+        <button id="add-action-btn" class="btn-primary">Add New Action</button> 
+        <button id="close-manage-actions-btn" class="btn-secondary">Close</button> 
+    </div>
+</div>
+
+<div id="add-edit-action-modal" class="modal hidden">  
+    <div class="modal-content">
+        <h3 id="action-modal-title">Add New Action</h3>  
+        <div class="form-group">
+            <label for="action-name">Name</label>
+            <input type="text" id="action-name" required>  
+        </div>
+        <div class="form-group">
+            <label for="action-text">Action Content (Use <userPrompt> format)</label>
+            <textarea id="action-text" class="modal-textarea" required></textarea> 
+        </div>
+        <div class="form-group">
+            <label for="action-style">Bubble Style</label>
+            <select id="action-style"> 
+                <option value="default">Default (Blue Border)</option>
+                <option value="hug">🤗 Hug (Gold)</option>
+                <option value="punch">👊 Punch (Red)</option>
+                <option value="high-five">✋ High-Five (Green)</option>
+                <option value="custom">Custom (Input Below)</option>
+            </select>
+        </div>
+        <div class="form-group" id="custom-style-input" style="display: none;">
+            <label for="action-custom-style">Custom Emoji/Color</label>
+            <input type="text" id="action-custom-style" placeholder="e.g., 🎉 yellow">
+        </div>
+        <button id="save-action-btn" class="btn-primary">Save Action</button> 
+        <button id="cancel-action-btn" class="btn-secondary">Cancel</button> 
+    </div>
+</div>
+
+    <div id="thinking-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>AI Thought Process</h3>
+            <div id="thinking-content" class="modal-textarea">Loading...</div>
+            <div class="modal-buttons">
+                <button id="close-thinking-btn" class="btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-memories-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Chat Memories</h3>
+            <p>This is a list of all your chat memories in the database.</p>
+            <div id="memories-list"></div>
+            <button id="close-memories-btn" class="btn-secondary">Close</button>
+        </div>
+    </div>
+
+    <div id="view-knowledge-files-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Knowledge Files</h3>
+            <p>These are the files currently indexed in your local knowledge base.</p>
+            <div id="knowledge-files-list"></div>
+            <button id="close-knowledge-files-btn" class="btn-secondary">Close</button>
+        </div>
+    </div>
+
+<div id="clear-confirm-modal" class="modal hidden">
+    <div class="modal-content">
+        <h3 id="clear-modal-title">Confirm Clearance</h3>
+        <p id="clear-modal-message">Are you sure you want to proceed? This action cannot be undone.</p>
+        
+        <div class="modal-buttons">
+            <button id="confirm-clear-action-btn" class="btn-danger">Yes, I'm Sure</button>
+            <button id="cancel-clear-action-btn" class="btn-secondary">Cancel</button>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="selfie-gen-modal" class="modal hidden">
+    <div class="modal-content">
+        <h3>Generate Selfie</h3>
+            <div class="form-group">
+                <label for="attire-prompt-input">Custom Attire (Optional)</label>
+                <input type="text" id="attire-prompt-input" placeholder="e.g., A flowing red dress with gold trim">
+            </div>
+                <p id="selfie-modal-description">Enter a suggestion for the scene. Your AI companion will consider your request when creating the selfie.</p>
+                <textarea id="selfie-prompt-input" class="modal-textarea" placeholder="e.g., riding a horse, relaxing on a beach... (can be left blank)"></textarea>
+                    <div class="modal-buttons">
+                        <button id="selfie-gen-submit-btn" class="btn-primary">Generate</button>
+                        <button id="selfie-gen-cancel-btn" class="btn-secondary">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="video-gen-modal" class="modal hidden">
+    <div class="modal-content">
+        <h3 id="video-modal-title">Selfie Video Generation</h3>
+            <p id="video-modal-description">Generate a simple video scene featuring your AI companion.</p>
+            <hr>
+            <div class="form-group">
+                <label for="attire-prompt-input-video">Custom Attire (Optional)</label>
+                <input type="text" id="attire-prompt-input-video" placeholder="Override default outfit">
+            </div>
+            <p>Enter a suggestion for the video scene (e.g., 'Walking slowly into the mist').</p>
+                <textarea id="video-prompt-input" class="modal-textarea" placeholder="e.g., walking through a neon-lit city..."></textarea>
+            <div class="modal-buttons">
+                <button id="video-gen-submit-btn" class="btn-primary">Generate</button>
+                <button id="video-gen-cancel-btn" class="btn-secondary">Close</button>
+            </div>
+            <button id="open-selfie-video-output-btn" class="btn-secondary hidden">📂 Open Output Folder</button>
+        </div>
+    </div>
+
+    <div id="insert-text-object-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Insert Text as Object</h3>
+            <p>Paste or type text below. It will be inserted as a styled object to draw the LLM's attention.</p>
+            <textarea id="text-object-input" class="modal-textarea" placeholder="Paste your text here..." rows="10" style="width: 100%; min-height: 200px;"></textarea>
+            <div class="modal-buttons">
+                <button id="text-object-confirm-btn" class="btn-primary">Insert</button>
+                <button id="text-object-cancel-btn" class="btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <button id="quick-insert-fab" class="quick-insert-fab" title="Quick Insert (Ctrl+K)" aria-label="Open Quick Insert">
+        <span class="fab-icon">⚡</span>
+    </button>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js  " defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.5/dist/purify.min.js  " defer></script>
+    <script type="module" src="renderer.js" defer></script>
+</body>
+</html>

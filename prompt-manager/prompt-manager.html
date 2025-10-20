@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Manager - OpenElara</title>
+    <link rel="stylesheet" href="../assets/styles/style.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--primary-bg-color);
+            color: var(--text-color);
+            overflow-y: auto;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        
+        .main-content {
+            min-height: calc(100vh - 40px);
+            padding-bottom: 50px; /* Buffer space at the bottom */
+        }
+        
+        .window-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .window-header h2 {
+            margin: 0;
+            font-size: 24px;
+            color: var(--accent-color);
+        }
+        
+        .window-header p {
+            margin: 5px 0 0 0;
+            color: var(--text-muted-color);
+            font-size: 14px;
+        }
+        
+        .prompts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .prompt-card {
+            background-color: var(--secondary-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        
+        .prompt-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow-color-rgba);
+        }
+        
+        .prompt-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .prompt-card-type {
+            font-size: 20px;
+            margin-right: 8px;
+        }
+        
+        .prompt-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--accent-color);
+            flex-grow: 1;
+        }
+        
+        .prompt-card-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .prompt-card-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .prompt-card-btn:hover {
+            opacity: 1;
+        }
+        
+        .prompt-card-body {
+            font-size: 13px;
+            color: var(--text-muted-color);
+            line-height: 1.4;
+            max-height: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .prompt-card-meta {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+            font-size: 11px;
+            color: var(--text-muted-color);
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: var(--secondary-bg-color);
+            border-radius: 8px;
+        }
+        
+        .filter-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .filter-btn {
+            padding: 8px 15px;
+            border: 1px solid var(--border-color);
+            background-color: var(--tertiary-bg-color);
+            color: var(--text-color);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .filter-btn:hover {
+            background-color: var(--accent-color);
+            color: var(--background-color);
+        }
+        
+        .filter-btn.active {
+            background-color: var(--accent-color);
+            color: var(--background-color);
+            font-weight: 600;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted-color);
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal-container {
+            background-color: var(--secondary-bg-color);
+            border-radius: 10px;
+            padding: 25px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <div class="window-header">
+            <h2>🔖 Prompt Manager</h2>
+            <p>Manage your saved prompts for chat, image, and video generation</p>
+        </div>
+    
+    <div class="action-bar">
+        <div class="filter-controls">
+            <span style="font-size: 14px; margin-right: 5px;">Filter:</span>
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="chat">💬 Chat</button>
+            <button class="filter-btn" data-filter="image">🖼️ Image</button>
+            <button class="filter-btn" data-filter="video">🎬 Video</button>
+            <button class="filter-btn" data-filter="modifier">🔧 Modifier</button>
+        </div>
+        <button id="add-prompt-btn" class="btn-primary">+ Add New Prompt</button>
+    </div>
+    
+    <div id="prompts-container">
+        <div class="prompts-grid" id="prompts-grid">
+        </div>
+        
+        <div class="empty-state" id="empty-state" style="display: none;">
+            <div class="empty-state-icon">📝</div>
+            <h3>No prompts yet</h3>
+            <p>Create your first prompt to get started!</p>
+        </div>
+    </div>
+    
+    <div id="edit-modal" class="modal-overlay">
+        <div class="modal-container">
+            <h3 id="modal-title">Add New Prompt</h3>
+            <p style="color: var(--text-muted-color); font-size: 14px; margin-bottom: 20px;">
+                This is a simplified editor. For advanced prompt building, use the main window.
+            </p>
+            
+            <div class="form-group">
+                <label for="prompt-name">Prompt Name</label>
+                <input type="text" id="prompt-name" placeholder="Enter prompt name">
+            </div>
+            
+            <div class="form-group">
+                <label for="prompt-type">Type</label>
+                <select id="prompt-type">
+                    <option value="chat">💬 Chat / Text Generation</option>
+                    <option value="image">🖼️ Image Generation</option>
+                    <option value="video">🎬 Video Generation</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="prompt-text">Prompt Content</label>
+                <textarea id="prompt-text" style="min-height: 150px; width: 100%; resize: vertical;" placeholder="Enter your prompt here..."></textarea>
+            </div>
+            
+            <div class="modal-buttons" style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                <button id="modal-cancel-btn" class="btn-secondary">Cancel</button>
+                <button id="modal-save-btn" class="btn-primary">Save Prompt</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="./prompt-manager-renderer.js"></script>
+</div> <!-- main-content -->
+    </body>
+</html>

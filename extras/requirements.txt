@@ -1,0 +1,43 @@
+# OpenElara Standalone Tools - Master Requirements
+# Install all dependencies for all extras tools
+# Python 3.8+ required
+
+# ============================================
+# USAGE:
+#   pip install -r requirements.txt
+#
+# OR install individual tool requirements:
+#   pip install -r file-converter/requirements.txt
+#   pip install -r image-processor/requirements.txt
+#   pip install -r watermark-viewer/requirements.txt
+#   pip install -r token-manager/requirements.txt
+# ============================================
+
+# Core Image Processing (used by multiple tools)
+Pillow>=10.0.0
+
+# File Converter Specific
+pytesseract>=0.3.10
+python-docx>=1.0.0
+pdfplumber>=0.10.0
+openpyxl>=3.1.0
+html2text>=2020.1.16
+chardet>=5.0.0
+
+# Token Manager Specific
+tiktoken>=0.5.0
+
+# UI Framework (all tools)
+tkinterdnd2>=0.3.0
+
+# Optional: Build to .exe
+# pyinstaller>=6.0.0
+
+# ============================================
+# NOTES:
+# - Tesseract OCR must be installed separately
+#   Download: https://github.com/UB-Mannheim/tesseract/wiki
+#
+# - ffmpeg required for video watermark extraction
+#   Download: https://ffmpeg.org/download.html
+# ============================================

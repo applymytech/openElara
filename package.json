@@ -1,0 +1,122 @@
+{
+  "name": "openelara",
+  "version": "1.1.0",
+  "description": "ELARA, Enahnced Local Artificial Responsive Assistant. An Electron-based LLM access tool, with local RAG knowledge databases and file handling.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "electron-builder install-app-deps",
+    "prepare-installer": "node ./build/prepare-signing-optional.js || true",
+    "build": "npm run prepare-installer && electron-builder --win",
+    "publish": "npm run prepare-installer && electron-builder --win --publish always"
+  },
+  "keywords": [],
+  "author": "Andrew Quartly - Apply My Tech",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^38.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "dependencies": {
+    "@types/three": "^0.180.0",
+    "axios": "^1.7.2",
+    "better-sqlite3": "^11.1.2",
+    "c2pa-node": "^0.5.26",
+    "canvas": "^3.2.0",
+    "electron-log": "^4.4.8",
+    "electron-store": "^8.1.0",
+    "electron-updater": "^6.2.1",
+    "exceljs": "^4.4.0",
+    "express": "^4.18.2",
+    "gltf-pipeline": "^4.3.0",
+    "gpt-tokenizer": "^3.0.1",
+    "mammoth": "^1.10.0",
+    "pdf-parse": "^1.1.1",
+    "sharp": "^0.34.4",
+    "three": "^0.180.0",
+    "tiktoken": "^1.0.22"
+    ,
+    "form-data": "^4.0.0"
+  },
+  "build": {
+    "appId": "com.applymytech.openelara",
+    "productName": "openElara",
+    "publish": {
+      "provider": "github",
+      "owner": "applymytech",
+      "repo": "openElara",
+      "private": false
+    },
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "package.json",
+      "config.js",
+      "account.html",
+      "account.js",
+      "login.html",
+      "login.js",
+      "index.html",
+      "renderer.js",
+      "preload.js",
+      "style.css",
+      "icon.ico",
+      "icon.png",
+      "privacy.html",
+      "history.html",
+      "history-renderer.js",
+      "viewer.html",
+      "viewer.js",
+      "loading.html",
+      "openElara_loading.mp4",
+      "LICENSE",
+      "requirements.txt",
+      "deepai-studio/**/*",
+      "account/**/*",
+      "action-manager/**/*",
+      "advanced-image-gen/**/*",
+      "advanced-video-gen/**/*",
+      "file-converter/**/*",
+      "power-knowledge/**/*",
+      "prompt-manager/**/*",
+      "scrapy/**/*",
+      "signer/**/*",
+      "src/**/*",
+      "assets/**/*",
+      "viewer/**/*",
+      "!**/*.log",
+      "!extras/**/*"
+    ],
+    "extraResources": [
+      "backend",
+      "functions"
+    ],
+    "asarUnpack": [
+      "**/node_modules/electron-log/**",
+      "**/node_modules/electron-updater/**",
+      "openElara_loading.mp4"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "openElara",
+      "license": "build/EULA.txt",
+      "include": "build/installer.nsh"
+    }
+  }
+}

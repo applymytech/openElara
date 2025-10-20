@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepAI Studio - OpenElara</title>
+    <link rel="stylesheet" href="../assets/styles/style.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1d3a 0%, #2d1b3d 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            color: #e0e0e0;
+            overflow-y: auto;
+        }
+
+        .deepai-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(30, 30, 30, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        h1 {
+            text-align: center;
+            color: #a78bfa;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #a0a0a0;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        .tool-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .tab-navigation {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #333;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: #888;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            color: #a78bfa;
+        }
+
+        .tab-btn.active {
+            color: #a78bfa;
+            border-bottom-color: #a78bfa;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        label {
+            display: block;
+            color: #b0b0b0;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="file"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 0.95em;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: 'Consolas', 'Courier New', monospace;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #a78bfa;
+            box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.2);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #a78bfa;
+            color: #1a1a1a;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #8b5cf6;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(167, 139, 250, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #555;
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: #666;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .log-output {
+            background: #1a1a1a;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.85em;
+            display: none;
+        }
+
+        .log-output.active {
+            display: block;
+        }
+
+        .previews-container {
+            margin-top: 20px;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: #a78bfa;
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #8b5cf6;
+        }
+
+        .log-output::-webkit-scrollbar,
+        .previews-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .log-output::-webkit-scrollbar-track,
+        .previews-container::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 4px;
+        }
+
+        .log-output::-webkit-scrollbar-thumb,
+        .previews-container::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
+        }
+
+        .log-output::-webkit-scrollbar-thumb:hover,
+        .previews-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .tool-description {
+            background: rgba(167, 139, 250, 0.1);
+            border-left: 3px solid #a78bfa;
+            padding: 15px;
+            border-radius: 0 6px 6px 0;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .tool-card {
+            background: rgba(40, 40, 40, 0.8);
+            border-radius: 8px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid #444;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tool-card:hover {
+            background: rgba(60, 60, 60, 0.8);
+            transform: translateY(-2px);
+            border-color: #a78bfa;
+        }
+
+        .tool-card h3 {
+            color: #a78bfa;
+            margin-top: 0;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tool-card p {
+            color: #b0b0b0;
+            font-size: 0.9em;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="deepai-container">
+        <a href="#" id="back-link" class="back-link">← Back to Main App</a>
+
+        <div style="text-align: center;">
+            <span class="tool-badge">AI POWERED</span>
+        </div>
+        <h1>🧠 DeepAI Studio</h1>
+        <p class="subtitle">Access the full suite of DeepAI tools and services</p>
+
+        <div class="tab-navigation">
+            <button id="tab-tools" class="tab-btn active">AI Tools</button>
+            <button id="tab-image-editor" class="tab-btn">Image Editor</button>
+            <button id="tab-background-remover" class="tab-btn">Background Remover</button>
+            <button id="tab-colorizer" class="tab-btn">Colorizer</button>
+            <button id="tab-super-resolution" class="tab-btn">Super Resolution</button>
+            <button id="tab-waifu2x" class="tab-btn">Waifu2x</button>
+            <button id="tab-creative-upscale" class="tab-btn">Creative Upscale</button>
+            <button id="tab-text2img" class="tab-btn">Text to Image</button>
+            <button id="tab-inpainting" class="tab-btn">Inpainting</button>
+        </div>
+
+        <!-- Tools Selection Tab -->
+        <div id="tools-content" class="tab-content active">
+            <div class="tool-description">
+                <p>Select a DeepAI tool from the options below to get started. Each tool offers unique capabilities for image processing, editing, and enhancement.</p>
+            </div>
+
+            <div class="tool-grid">
+                <div class="tool-card" data-tool="image-editor">
+                    <h3>🎨 AI Photo Editor</h3>
+                    <p>Edit photos and images with AI. Transform your images using natural language descriptions.</p>
+                </div>
+                <div class="tool-card" data-tool="background-remover">
+                    <h3>✂️ Background Remover</h3>
+                    <p>Remove image backgrounds with AI. Automatically detect and remove backgrounds from any image.</p>
+                </div>
+                <div class="tool-card" data-tool="colorizer">
+                    <h3>🌈 Image Colorizer</h3>
+                    <p>Add color to old family photos and historic images, or bring an old film back to life with colorization.</p>
+                </div>
+                <div class="tool-card" data-tool="super-resolution">
+                    <h3>🔍 Super Resolution</h3>
+                    <p>Upscale images without losing content. Clarify, sharpen, and enhance photo quality with machine learning.</p>
+                </div>
+                <div class="tool-card" data-tool="waifu2x">
+                    <h3>✨ Waifu2x</h3>
+                    <p>Upscale anime-style art and photographs while reducing noise within the image.</p>
+                </div>
+                <div class="tool-card" data-tool="creative-upscale">
+                    <h3>🚀 Creative Upscale</h3>
+                    <p>Intelligently upscale images with creative enhancements and detail generation.</p>
+                </div>
+                <div class="tool-card" data-tool="text2img">
+                    <h3>📝 Text to Image</h3>
+                    <p>Generate images from text descriptions using DeepAI's powerful text-to-image models.</p>
+                </div>
+                <div class="tool-card" data-tool="inpainting">
+                    <h3>🖌️ Inpainting</h3>
+                    <p>Edit specific parts of an image by providing a mask and description of what to fill in.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Image Editor Tab -->
+        <div id="image-editor-content" class="tab-content hidden">
+            <div class="form-group">
+                <label for="editor-prompt">Editing Prompt</label>
+                <textarea id="editor-prompt" placeholder="Describe the changes you want to make to the image..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="editor-image-upload">Upload Image</label>
+                <input type="file" id="editor-image-upload" accept="image/*">
+                <small id="editor-image-upload-status"></small>
+            </div>
+
+            <div class="form-group">
+                <label for="editor-negative-prompt">Negative Prompt (Optional)</label>
+                <textarea id="editor-negative-prompt" placeholder="Specify what you DON'T want in the edited image..."></textarea>
+            </div>
+
+            <div class="form-group-row">
+                <div class="form-group">
+                    <label for="editor-strength">Editing Strength (0.1-1.0)</label>
+                    <input type="number" id="editor-strength" min="0.1" max="1.0" step="0.1" value="0.7">
+                </div>
+                <div class="form-group">
+                    <label for="editor-steps">Steps (1-50)</label>
+                    <input type="number" id="editor-steps" min="1" max="50" value="20">
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button id="generate-editor-btn" class="btn-primary">Edit Image</button>
+            </div>
+        </div>
+
+        <!-- Background Remover Tab -->
+        <div id="background-remover-content" class="tab-content hidden">
+            <div class="form-group">
+                <label for="bg-remover-image-upload">Upload Image</label>
+                <input type="file" id="bg-remover-image-upload" accept="image/*">
+                <small id="bg-remover-image-upload-status"></small>
+            </div>
+
+            <div class="modal-buttons">
+                <button id="generate-bg-remover-btn" class="btn-primary">Remove Background</button>
+            </div>
+        </div>
+
+        <!-- Colorizer Tab -->
+        <div id="colorizer-content" class="tab-content hidden">
+            <div class="form-group">
+                <label for="colorizer-image-upload">Upload Black & White Image</label>
+                <input type="file" id="colorizer-image-upload" accept="image/*">
+                <small id="colorizer-image-upload-status"></small>
+            </div>
+
+            <div class="modal-buttons">
+                <button id="generate-colorizer-btn" class="btn-primary">Colorize Image</button>
+            </div>
+        </div>
+
+        <!-- Super Resolution Tab -->
+        <div id="super-resolution-content" class="tab-content hidden">
+            <div class="form-group">
+                <label for="superres-image-upload">Upload Image</label>
+                <input type="file" id="superres-image-upload" accept="image/*">
+                <small id="superres-image-upload-status"></small>
+            </div>
+
+            <div class="modal-buttons">
+                <button id="generate-superres-btn" class="btn-primary">Enhance Image</button>
+            </div>
+        </div>
+
+        <!-- Waifu2x Tab -->
+        <div id="waifu2x-content" class="tab-content hidden">
+            <div class="form-group">
+                <label for="waifu2x-image-upload">Upload Image</label>
+                <input type="file" id="waifu2x-image-upload" accept="image/*">
+                <small id="waifu2x-image-upload-status"></small>
+            </div>
+
+            <div class="modal-buttons">
+                <button id="generate-waifu2x-btn" class="btn-primary">Upscale Image</button>
+            </div>
+        </div>
+
+        <!-- Creative Upscale Tab -->
+        <div id="creative-upscale-content" class="tab-content hidden">
+            <div class="form-group">
+                <label for="creative-upscale-image-upload">Upload Image</label>
+                <input type="file" id="creative-upscale-image-upload" accept="image/*">
+                <small id="creative-upscale-image-upload-status"></small>
+            </div>
+
+            <div class="modal-buttons">
+                <button id="generate-creative-upscale-btn" class="btn-primary">Creative Upscale</button>
+            </div>
+        </div>
+
+        <!-- Text to Image Tab -->
+        <div id="text2img-content" class="tab-content hidden">
+            <div class="form-group">
+                <label for="text2img-prompt">Text Prompt</label>
+                <textarea id="text2img-prompt" placeholder="Describe the image you want to generate..."></textarea>
+            </div>
+
+            <div class="modal-buttons">
+                <button id="generate-text2img-btn" class="btn-primary">Generate Image</button>
+            </div>
+        </div>
+
+        <!-- Inpainting Tab -->
+        <div id="inpainting-content" class="tab-content hidden">
+            <div class="form-group">
+                <label for="inpainting-image-upload">Upload Image</label>
+                <input type="file" id="inpainting-image-upload" accept="image/*">
+                <small id="inpainting-image-upload-status"></small>
+            </div>
+
+            <div class="form-group">
+                <label for="inpainting-mask-upload">Upload Mask</label>
+                <input type="file" id="inpainting-mask-upload" accept="image/*">
+                <small id="inpainting-mask-upload-status"></small>
+            </div>
+
+            <div class="form-group">
+                <label for="inpainting-prompt">Inpainting Prompt</label>
+                <textarea id="inpainting-prompt" placeholder="Describe what you want to fill in the masked area..."></textarea>
+            </div>
+
+            <div class="modal-buttons">
+                <button id="generate-inpainting-btn" class="btn-primary">Inpaint Image</button>
+            </div>
+        </div>
+
+        <div id="deepai-log" class="log-output"></div>
+        <div id="deepai-previews-container" class="previews-container"></div>
+        <button id="open-deepai-output-btn" class="btn-secondary" style="display: none;">📂 Open Output Folder</button>
+    </div>
+
+    <script type="module" src="deepai-studio.js"></script>
+</body>
+
+</html>

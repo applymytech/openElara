@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Action Manager - OpenElara</title>
+    <link rel="stylesheet" href="../assets/styles/style.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--primary-bg-color);
+            color: var(--text-color);
+            overflow-y: auto;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        
+        .main-content {
+            min-height: calc(100vh - 40px);
+            padding-bottom: 50px; /* Buffer space at the bottom */
+        }
+        
+        .window-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .window-header h2 {
+            margin: 0;
+            font-size: 24px;
+            color: var(--accent-color);
+        }
+        
+        .window-header p {
+            margin: 5px 0 0 0;
+            color: var(--text-muted-color);
+            font-size: 14px;
+        }
+        
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .action-card {
+            background-color: var(--secondary-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow-color-rgba);
+        }
+        
+        .action-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .action-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--accent-color);
+            flex-grow: 1;
+        }
+        
+        .action-card-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .action-card-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .action-card-btn:hover {
+            opacity: 1;
+        }
+        
+        .action-preview {
+            background-color: var(--tertiary-bg-color);
+            border: 1px dashed var(--border-color);
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 13px;
+            color: var(--text-muted-color);
+            max-height: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: var(--secondary-bg-color);
+            border-radius: 8px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted-color);
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal-container {
+            background-color: var(--secondary-bg-color);
+            border-radius: 10px;
+            padding: 25px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <div class="window-header">
+            <h2>⚡ Action Manager</h2>
+            <p>Manage your custom actions for styling LLM responses</p>
+        </div>
+    
+    <div class="action-bar">
+        <div style="font-size: 14px; color: var(--text-muted-color);">
+            Actions apply custom styling to text generated by the LLM
+        </div>
+        <button id="add-action-btn" class="btn-primary">+ Add New Action</button>
+    </div>
+    
+    <div id="actions-container">
+        <div class="actions-grid" id="actions-grid">
+            <!-- Action cards will be inserted here -->
+        </div>
+        
+        <div class="empty-state" id="empty-state" style="display: none;">
+            <div class="empty-state-icon">⚡</div>
+            <h3>No custom actions yet</h3>
+            <p>Create your first action to get started!</p>
+        </div>
+    </div>
+    
+    <!-- Edit/Add Modal -->
+    <div id="edit-modal" class="modal-overlay">
+        <div class="modal-container">
+            <h3 id="modal-title">Add New Action</h3>
+            <p style="color: var(--text-muted-color); font-size: 14px; margin-bottom: 20px;">
+                Actions provide custom styling for LLM-generated content
+            </p>
+            
+            <div class="form-group">
+                <label for="action-name">Action Name</label>
+                <input type="text" id="action-name" placeholder="e.g., Code Block, Poetry, Email">
+            </div>
+            
+            <div class="form-group">
+                <label for="action-text">Instruction to LLM</label>
+                <textarea id="action-text" style="min-height: 100px; width: 100%; resize: vertical;" placeholder="Tell the LLM how to format the response (e.g., 'Format as a Python code block')"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="action-style">Bubble Style</label>
+                <select id="action-style">
+                    <option value="default">Default (Blue Border)</option>
+                    <option value="hug">🤗 Hug (Gold)</option>
+                    <option value="punch">👊 Punch (Red)</option>
+                    <option value="high-five">✋ High-Five (Green)</option>
+                    <option value="custom">Custom (Input Below)</option>
+                </select>
+            </div>
+            
+            <div class="form-group" id="custom-style-group" style="display: none;">
+                <label for="custom-style-input">Custom Emoji/Color (Optional)</label>
+                <textarea id="custom-style-input" style="min-height: 60px; width: 100%; resize: vertical; font-family: monospace;" placeholder="e.g., 🎉 yellow"></textarea>
+            </div>
+            
+            <div class="modal-buttons" style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                <button id="modal-cancel-btn" class="btn-secondary">Cancel</button>
+                <button id="modal-save-btn" class="btn-primary">Save Action</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="./action-manager-renderer.js"></script>
+</div> <!-- main-content -->
+    </body>
+</html>

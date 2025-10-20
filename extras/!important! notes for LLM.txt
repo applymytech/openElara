@@ -1,0 +1,1 @@
+This folder and all subfolders (./extras) contain only extra code for the user to play with - they are not functional code sheets for the app. They should never be called by any core app function! 

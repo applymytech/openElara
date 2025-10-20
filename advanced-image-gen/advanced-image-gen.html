@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Image Generation - OpenElara</title>
+    <link rel="stylesheet" href="../assets/styles/style.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1d3a 0%, #2d1b3d 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            color: #e0e0e0;
+            overflow-y: auto;
+        }
+
+        .image-gen-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(30, 30, 30, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        h1 {
+            text-align: center;
+            color: #a78bfa;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #a0a0a0;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        .tool-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .tab-navigation {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #333;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: #888;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            color: #a78bfa;
+        }
+
+        .tab-btn.active {
+            color: #a78bfa;
+            border-bottom-color: #a78bfa;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        label {
+            display: block;
+            color: #b0b0b0;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="file"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 0.95em;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: 'Consolas', 'Courier New', monospace;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #a78bfa;
+            box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.2);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #a78bfa;
+            color: #1a1a1a;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #8b5cf6;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(167, 139, 250, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #555;
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: #666;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .switch-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-weight: normal;
+        }
+
+        .slider {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+            background-color: #ccc;
+            border-radius: 20px;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            border-radius: 50%;
+            transition: .4s;
+        }
+
+        input:checked + .slider {
+            background-color: #a78bfa;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        .log-output {
+            background: #1a1a1a;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.85em;
+            display: none;
+        }
+
+        .log-output.active {
+            display: block;
+        }
+
+        .previews-container {
+            margin-top: 20px;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: #a78bfa;
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #8b5cf6;
+        }
+
+        .log-output::-webkit-scrollbar,
+        .previews-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .log-output::-webkit-scrollbar-track,
+        .previews-container::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 4px;
+        }
+
+        .log-output::-webkit-scrollbar-thumb,
+        .previews-container::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
+        }
+
+        .log-output::-webkit-scrollbar-thumb:hover,
+        .previews-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="image-gen-container">
+        <a href="#" id="back-link" class="back-link">← Back to Main App</a>
+
+        <div style="text-align: center;">
+            <span class="tool-badge">AI POWERED</span>
+        </div>
+        <h1>🎨 Advanced Image Generation</h1>
+        <p class="subtitle">Create stunning AI-generated images with advanced controls</p>
+
+        <div class="tab-navigation">
+            <button id="tab-image-t2i" class="tab-btn active">Text-to-Image (T2I)</button>
+            <button id="tab-image-i2i" class="tab-btn">Image-to-Image (I2I)</button>
+        </div>
+
+        <div class="form-group">
+            <label for="image-model-select">Model</label>
+            <select id="image-model-select"></select>
+        </div>
+
+        <div class="form-group">
+            <label for="image-prompt">Prompt</label>
+            <div style="display: flex; gap: 10px; margin-bottom: 5px;">
+                <button id="insert-image-prompt-btn" class="btn-secondary" style="flex-shrink: 0;">📋 Insert from Prompt Manager</button>
+                <button id="use-default-image-prompt-btn" class="btn-secondary" style="flex-shrink: 0;">✨ Use Template</button>
+            </div>
+            <textarea id="image-prompt" placeholder="A futuristic city at sunset..."></textarea>
+        </div>
+
+        <div id="advanced-options" class="accordion-content">
+            <div class="form-group">
+                <label for="image-negative-prompt">Negative Prompt</label>
+                <textarea id="image-negative-prompt" placeholder="Blurry, low quality, duplicate"></textarea>
+            </div>
+
+            <div class="form-group-row">
+                <div class="form-group">
+                    <label for="image-aspect-ratio">Aspect Ratio</label>
+                    <select id="image-aspect-ratio">
+                        <option value="1:1" data-width="1024" data-height="1024" selected>Square (1:1)</option>
+                        <option value="4:3" data-width="1024" data-height="768">Landscape (4:3)</option>
+                        <option value="16:9" data-width="1024" data-height="576">Wide (16:9)</option>
+                        <option value="3:4" data-width="768" data-height="1024">Portrait (3:4)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="steps-slider">Steps (<span id="steps-value">20</span>)</label>
+                    <input type="range" id="steps-slider" min="1" max="50" value="20">
+                </div>
+            </div>
+
+            <div class="form-group-row">
+                <div class="form-group">
+                    <label for="guidance-scale-slider">Guidance Scale (<span id="guidance-scale-value">3.5</span>)</label>
+                    <input type="range" id="guidance-scale-slider" min="1.0" max="20.0" step="0.1" value="3.5">
+                </div>
+                <div class="form-group">
+                    <label for="output-format-select">Output Format</label>
+                    <select id="output-format-select">
+                        <option value="png" selected>PNG (Lossless)</option>
+                        <option value="jpeg">JPEG (Compressed)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group-row">
+                <div class="form-group">
+                    <label for="image-width">Width</label>
+                    <input type="number" id="image-width" value="1024" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="image-height">Height</label>
+                    <input type="number" id="image-height" value="1024" readonly>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="toggle-control">
+                    <label for="upscale-toggle" class="toggle-label">
+                        <span class="toggle-text">Enable Upscale</span>
+                        <span class="toggle-description">(May increase cost/time)</span>
+                    </label>
+                    <label for="upscale-toggle" class="switch-label">
+                        <input type="checkbox" id="upscale-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="toggle-control">
+                    <label for="disable-safety-checker-toggle" class="toggle-label">
+                        <span class="toggle-text">Disable Safety Filter</span>
+                        <div class="toggle-warning">⚠️ WARNING: Disabling will create NSFW content!</div>
+                    </label>
+                    <label for="disable-safety-checker-toggle" class="switch-label">
+                        <input type="checkbox" id="disable-safety-checker-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="form-group" id="image-upload-group" style="display: none;">
+            <label for="image-upload">Start from Image (Vision)</label>
+            <input type="file" id="image-upload" accept="image/*">
+            <small id="image-upload-status"></small>
+        </div>
+
+        <div class="modal-buttons">
+            <button id="generate-image-btn-submit" class="btn-primary">Generate</button>
+        </div>
+        <div id="image-gen-log" class="log-output"></div>
+        <div id="image-previews-container" class="previews-container"></div>
+        <button id="open-image-output-btn" class="btn-secondary" style="display: none;">📂 Open Output Folder</button>
+    </div>
+
+    <script type="module" src="advanced-image-gen.js"></script>
+</body>
+
+</html>

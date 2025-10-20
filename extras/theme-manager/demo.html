@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Theme Manager - Demo</title>
+    <link rel="stylesheet" href="themeStyles.css">
+    <style>
+        .demo-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .color-picker-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        input[type="color"] {
+            width: 50px;
+            height: 40px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .demo-section {
+            background-color: var(--secondary-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .demo-section h2 {
+            color: var(--accent-color);
+            margin-bottom: 16px;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .status-messages {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .theme-status {
+            background-color: var(--tertiary-bg-color);
+            padding: 12px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            color: var(--secondary-text-color);
+        }
+
+        .spinner {
+            border: 3px solid var(--spinner-base-color);
+            border-top: 3px solid var(--accent-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="theme-active">
+    <div class="demo-container">
+        <h1>🎨 AI Theme Manager Demo</h1>
+        <p style="margin-bottom: 24px; color: var(--secondary-text-color);">
+            A professional, drag-and-drop theme system with AI-powered palette generation.
+        </p>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button id="toggle-theme" class="btn btn-primary">🌓 Toggle Light/Dark</button>
+            <button id="reset-theme" class="btn">🔄 Reset to Default</button>
+            
+            <div class="color-picker-group">
+                <input type="color" id="color-picker" value="#3498db">
+                <button id="generate-theme" class="btn btn-primary">✨ Generate AI Theme</button>
+            </div>
+        </div>
+
+        <!-- Theme Status -->
+        <div class="theme-status" id="theme-status">
+            Current Theme: Loading...
+        </div>
+
+        <!-- Demo Sections -->
+        <div class="demo-section">
+            <h2>Buttons & Actions</h2>
+            <div class="button-row">
+                <button class="btn">Default Button</button>
+                <button class="btn btn-primary">Primary Button</button>
+                <button class="btn" style="background-color: var(--success-color); color: var(--accent-contrast-text-color);">Success</button>
+                <button class="btn" style="background-color: var(--error-color); color: var(--accent-contrast-text-color);">Error</button>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>Typography & Links</h2>
+            <p>This is regular text using <code>--main-text-color</code>.</p>
+            <p style="color: var(--secondary-text-color);">This is muted text using <code>--secondary-text-color</code>.</p>
+            <p><a href="#">This is a link</a> using <code>--link-color</code>.</p>
+            <p style="color: var(--highlight-color);">⭐ This is highlighted text using <code>--highlight-color</code>.</p>
+        </div>
+
+        <div class="demo-section">
+            <h2>Status Messages</h2>
+            <div class="status-messages">
+                <div class="error">❌ Error: Something went wrong!</div>
+                <div class="success">✅ Success: Operation completed!</div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>Code Blocks</h2>
+            <pre><code>const theme = new ThemeManager();
+await theme.initialize();
+theme.toggleMode();</code></pre>
+        </div>
+
+        <div class="demo-section">
+            <h2>Cards & Panels</h2>
+            <div class="card">
+                <h3 style="color: var(--accent-color); margin-bottom: 8px;">Card Title</h3>
+                <p>This is a card using <code>--secondary-bg-color</code> with a shadow using <code>--shadow-color-rgba</code>.</p>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>Loading Spinner</h2>
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { ThemeManager } from './themeManager.js';
+        import { AIThemeGenerator } from './aiThemeGenerator.js';
+
+        // Initialize theme manager
+        const themeManager = new ThemeManager({
+            storageKey: 'demo-theme',
+            defaultMode: 'dark',
+            onThemeChange: (theme) => {
+                updateStatus(theme);
+            }
+        });
+
+        await themeManager.initialize();
+        updateStatus(themeManager.getCurrentTheme());
+
+        // Initialize AI generator (configure with your API)
+        const aiGenerator = new AIThemeGenerator({
+            apiKey: 'YOUR_API_KEY_HERE', // Replace with your API key
+            modelId: 'gpt-4',
+            characterName: 'ThemeBot',
+            characterPersona: 'A creative and bold UI designer who loves vibrant colors and accessibility'
+        });
+
+        // Event listeners
+        document.getElementById('toggle-theme').addEventListener('click', async () => {
+            await themeManager.toggleMode();
+        });
+
+        document.getElementById('reset-theme').addEventListener('click', async () => {
+            await themeManager.resetToDefault();
+        });
+
+        document.getElementById('generate-theme').addEventListener('click', async () => {
+            const color = document.getElementById('color-picker').value;
+            const statusEl = document.getElementById('theme-status');
+            
+            statusEl.textContent = `Generating theme from ${color}... (this may take 10-20 seconds)`;
+            
+            try {
+                const result = await aiGenerator.generateFromColor(color);
+                
+                if (result.success) {
+                    await themeManager.applyCustomTheme(result.palette);
+                    statusEl.textContent = `✨ AI-generated theme applied! Based on ${color}`;
+                } else {
+                    statusEl.textContent = `❌ Error: ${result.error}`;
+                }
+            } catch (error) {
+                statusEl.textContent = `❌ Error: ${error.message}`;
+            }
+        });
+
+        function updateStatus(theme) {
+            const statusEl = document.getElementById('theme-status');
+            const mode = theme.isLightActive ? 'Light' : 'Dark';
+            const type = theme.mode === 'custom' ? 'Custom AI-Generated' : 'Default';
+            statusEl.textContent = `Current Theme: ${type} (${mode} Mode)`;
+        }
+    </script>
+</body>
+</html>

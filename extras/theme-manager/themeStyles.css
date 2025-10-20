@@ -1,0 +1,256 @@
+/**
+ * AI-Driven Theme Manager - Base Styles
+ * Default CSS variables for light and dark themes
+ * 
+ * @version 1.0.0
+ * @license MIT
+ */
+
+/* ==========================================================================
+   DEFAULT THEME VARIABLES - Dark Mode Defaults
+   ========================================================================== */
+
+:root {
+  /* Backgrounds */
+  --main-bg-color: #1e1e1e;
+  --secondary-bg-color: #252526;
+  --tertiary-bg-color: #3c3c3c;
+  --button-bg-color: #444;
+  --button-hover-bg-color: #555;
+  
+  /* Borders & Shadows */
+  --border-color: #3c3c3c;
+  --shadow-color-rgba: rgba(0, 0, 0, 0.4);
+  
+  /* Text Colors */
+  --main-text-color: #d4d4d4;
+  --secondary-text-color: #a0a0a0;
+  --accent-contrast-text-color: #ffffff;
+  
+  /* Accent Colors */
+  --accent-color: #0e639c;
+  --accent-color-hover: #1177bb;
+  --link-color: #6a9ec5;
+  --highlight-color: #FFD700;
+  
+  /* Message Bubbles (Optional - remove if not needed) */
+  --message-user-bg: #0e639c;
+  --message-ai-bg: #2d2d30;
+  
+  /* Code Blocks (Optional) */
+  --code-block-bg: #282c34;
+  
+  /* Status Colors */
+  --error-color: #e74c3c;
+  --success-color: #2ecc71;
+  
+  /* Utility */
+  --spinner-base-color: #3c3c3c;
+  
+  /* Reaction Colors (Optional - customize or remove) */
+  --hug-color: #ffc107;
+  --punch-color: #dc3545;
+  --high-five-color: #28a745;
+}
+
+/* ==========================================================================
+   LIGHT THEME OVERRIDES
+   Applied when body has both .theme-active and .light-theme classes
+   ========================================================================== */
+
+body.theme-active.light-theme {
+  /* Backgrounds */
+  --main-bg-color: #f5f5f5;
+  --secondary-bg-color: #ffffff;
+  --tertiary-bg-color: #e9ecef;
+  --button-bg-color: #e0e0e0;
+  --button-hover-bg-color: #d0d0d0;
+  
+  /* Borders & Shadows */
+  --border-color: #ccc;
+  --shadow-color-rgba: rgba(0, 0, 0, 0.1);
+  
+  /* Text Colors */
+  --main-text-color: #222;
+  --secondary-text-color: #555;
+  --accent-contrast-text-color: #ffffff;
+  
+  /* Accent Colors */
+  --accent-color: #007bff;
+  --accent-color-hover: #0056b3;
+  --link-color: #0056b3;
+  --highlight-color: #e6b400;
+  
+  /* Message Bubbles */
+  --message-user-bg: #007bff;
+  --message-ai-bg: #e9ecef;
+  
+  /* Code Blocks */
+  --code-block-bg: #f8f9fa;
+  
+  /* Status Colors */
+  --error-color: #f8d7da;
+  --success-color: #d4edda;
+  
+  /* Utility */
+  --spinner-base-color: #e0e0e0;
+  
+  /* Reaction Colors */
+  --hug-color: #ffc107;
+  --punch-color: #dc3545;
+  --high-five-color: #28a745;
+}
+
+/* ==========================================================================
+   BASE STYLES (Optional - customize for your app)
+   ========================================================================== */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+  background-color: var(--main-bg-color);
+  color: var(--main-text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Utility class for hiding elements */
+.hidden {
+  display: none !important;
+}
+
+/* ==========================================================================
+   COMPONENT EXAMPLES (Optional - customize or remove)
+   ========================================================================== */
+
+/* Buttons */
+.btn {
+  background-color: var(--button-bg-color);
+  color: var(--main-text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn:hover {
+  background-color: var(--button-hover-bg-color);
+}
+
+.btn-primary {
+  background-color: var(--accent-color);
+  color: var(--accent-contrast-text-color);
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-color-hover);
+}
+
+/* Cards/Panels */
+.card {
+  background-color: var(--secondary-bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 8px var(--shadow-color-rgba);
+}
+
+/* Links */
+a {
+  color: var(--link-color);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--accent-color-hover);
+  text-decoration: underline;
+}
+
+/* Code Blocks */
+code, pre {
+  background-color: var(--code-block-bg);
+  color: var(--main-text-color);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+}
+
+pre {
+  padding: 12px;
+  overflow-x: auto;
+}
+
+/* Status Messages */
+.error {
+  color: var(--error-color);
+  background-color: var(--tertiary-bg-color);
+  padding: 8px 12px;
+  border-radius: 4px;
+  border-left: 4px solid var(--error-color);
+}
+
+.success {
+  color: var(--success-color);
+  background-color: var(--tertiary-bg-color);
+  padding: 8px 12px;
+  border-radius: 4px;
+  border-left: 4px solid var(--success-color);
+}
+
+/* ==========================================================================
+   THEME TOGGLE UI (Optional - include if using theme controls)
+   ========================================================================== */
+
+.theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: var(--button-bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 24px;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  z-index: 1000;
+}
+
+.theme-toggle:hover {
+  background-color: var(--button-hover-bg-color);
+  transform: scale(1.1);
+}
+
+.theme-toggle:active {
+  transform: scale(0.95);
+}
+
+/* ==========================================================================
+   NOTES
+   ========================================================================== */
+
+/*
+ * CSS CASCADE STRATEGY:
+ * 1. :root defines dark theme defaults (specificity: 0,0,1)
+ * 2. body.theme-active.light-theme overrides for light mode (specificity: 0,1,2)
+ * 3. Custom themes use inline styles with !important (highest priority)
+ * 
+ * This ensures custom themes always override defaults without CSS specificity wars.
+ * 
+ * CUSTOMIZATION:
+ * - Add/remove CSS variables as needed for your app
+ * - Adjust color values to match your brand
+ * - Remove optional sections (message bubbles, reactions, etc.)
+ * - Add your own component styles
+ */

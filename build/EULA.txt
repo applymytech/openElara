@@ -1,0 +1,370 @@
+END USER LICENSE AGREEMENT (EULA)
+================================================================================
+
+openElara - Open Source AI Companion
+© 2025 Andrew Quartly with the domain applymytech.ai
+Version 1.0 (Placeholder - Subject to Legal Review)
+Last Updated: October 12, 2025
+
+================================================================================
+IMPORTANT LEGAL NOTICE
+================================================================================
+
+This is a PLACEHOLDER End User License Agreement provided for development and 
+testing purposes. While it reflects the intended licensing philosophy of 
+openElara (open-source, free for personal/internal use, commercial licensing 
+for derivatives), this document has NOT been reviewed by qualified legal 
+counsel.
+
+Before any commercial use, public distribution, or deployment of this software 
+or derivative works, this EULA must be reviewed and approved by legal 
+professionals familiar with open-source licensing, intellectual property law, 
+and commercial software licensing in your jurisdiction(s).
+
+DO NOT rely on this document for actual legal protection without professional 
+legal review.
+
+================================================================================
+1. ACCEPTANCE OF TERMS
+================================================================================
+
+By installing, copying, downloading, accessing, or otherwise using openElara 
+(the "Software"), you ("User", "You", "Your") agree to be bound by the terms 
+of this End User License Agreement ("EULA" or "Agreement").
+
+IF YOU DO NOT AGREE TO THESE TERMS, DO NOT INSTALL OR USE THE SOFTWARE.
+
+This Agreement is between You and Andrew Quartly trading as Apply My Tech 
+("Licensor", "We", "Us", "Our"), the creator and distributor of openElara.
+
+================================================================================
+2. GRANT OF LICENSE
+================================================================================
+
+2.1 OPEN SOURCE SOFTWARE
+openElara is open-source software. The source code is publicly available 
+for inspection, modification, and distribution under the terms specified in 
+this EULA and the accompanying LICENSE file.
+
+2.2 PERSONAL USE LICENSE (FREE)
+We grant You a perpetual, worldwide, non-exclusive, royalty-free license to:
+  - Download, install, and use the Software for personal purposes
+  - Modify the Software for personal use
+  - Run the Software on any number of devices You personally own
+  - Share the unmodified Software with others (attribution required)
+
+2.3 INTERNAL BUSINESS USE LICENSE (FREE)
+Organizations may use openElara internally without charge, including:
+  - Installation on employee workstations
+  - Integration into internal workflows
+  - Modification for internal use only
+  - Training and onboarding with the Software
+
+EXCLUSION: Internal use does NOT include:
+  - Reselling the Software or access to it
+  - Embedding in products sold to customers
+  - Offering as a service (SaaS) to external users
+  - Using as a component of a commercial product
+
+2.4 COMMERCIAL DERIVATIVE LICENSE (REQUIRES AGREEMENT)
+If You create a derivative work or commercial product based on openElara that:
+  - Is sold, licensed, or offered as a service to third parties
+  - Generates revenue directly or indirectly from use of this Software
+  - Incorporates substantial portions of openElara's codebase or functionality
+  - Competes with openElara as a commercial offering
+
+You MUST obtain a separate Commercial Derivative License from the Licensor 
+BEFORE distributing or monetizing such derivative work.
+
+Contact: openelara@applymytech.com for commercial licensing inquiries.
+
+2.5 ROYALTY STRUCTURE (COMMERCIAL DERIVATIVES)
+Commercial derivatives that generate revenue may be subject to royalty 
+agreements. The Licensor's philosophy is:
+
+  "We'd rather have 0.1% of $100 million than 90% of nothing."
+
+Royalty rates are designed to be reasonable, revenue-based (not punitive), 
+and structured to encourage success rather than prevent it. Specific terms 
+are negotiated per use case.
+
+Early-stage startups, non-profits, and educational institutions may qualify 
+for reduced or deferred royalty arrangements.
+
+================================================================================
+3. INTELLECTUAL PROPERTY RIGHTS
+================================================================================
+
+3.1 OWNERSHIP
+The Software, including all code, algorithms, documentation, design, graphics, 
+trade names, trademarks, and other intellectual property, is and remains the 
+exclusive property of Andrew Quartly / Apply My Tech and contributors to the 
+openElara project.
+
+3.2 OPEN SOURCE CONTRIBUTIONS
+If You contribute code, documentation, or other materials to the openElara 
+project (via pull requests, patches, etc.), You:
+  - Retain copyright to Your contributions
+  - Grant Licensor a perpetual, worldwide, royalty-free license to use, 
+    modify, and distribute Your contributions as part of openElara
+  - Represent that You have the right to make such contributions
+  - Agree Your contributions may be sublicensed under this EULA
+
+3.3 USER DATA AND CONTENT
+All data You create, generate, or process with openElara (conversations, 
+files, images, videos, knowledge bases) remains YOUR property. The Software 
+operates locally and does NOT transmit Your data to the Licensor.
+
+See the Privacy Policy (privacy.html) for details on data handling.
+
+3.4 THIRD-PARTY COMPONENTS
+openElara incorporates third-party open-source libraries and components, each 
+governed by their respective licenses (see package.json and LICENSE file). 
+Your use of those components is subject to their original licenses.
+
+================================================================================
+4. RESTRICTIONS AND PROHIBITIONS
+================================================================================
+
+You MAY NOT, without explicit written permission:
+
+4.1 UNAUTHORIZED COMMERCIAL USE
+  - Sell, lease, or rent the Software or access to it
+  - Offer the Software as a hosted service (SaaS) to external users
+  - Embed the Software in commercial products sold to customers
+  - Remove or obscure attribution, copyright notices, or license terms
+
+4.2 MALICIOUS OR ILLEGAL USE
+  - Use the Software for any unlawful purpose
+  - Generate illegal, harmful, or abusive content
+  - Circumvent security features or encryption
+  - Use the Software to infringe third-party intellectual property rights
+  - Deploy the Software to violate privacy laws or regulations
+
+4.3 MISREPRESENTATION
+  - Claim the Software as Your own creation
+  - Imply endorsement by the Licensor without permission
+  - Rebrand as Your own product without a commercial derivative license
+  - Remove credits to original developers and contributors
+
+================================================================================
+5. THIRD-PARTY SERVICES AND API KEYS
+================================================================================
+
+5.1 YOUR RESPONSIBILITY
+openElara integrates with third-party AI services (TogetherAI, Ollama, Exa.ai, 
+AI/ML API, etc.). You are responsible for:
+  - Obtaining Your own API keys or accounts
+  - Complying with third-party terms of service
+  - Any costs incurred from API usage
+  - Data sent to those services (see their privacy policies)
+
+5.2 SYSTEM DEPENDENCIES
+openElara requires certain system dependencies to function properly:
+  - Python 3.10+ (for AI/ML features)
+  - Java (for document processing)
+  - Tesseract OCR (for image text extraction)
+
+The installer will check for these dependencies and provide download links if 
+missing, but will not automatically install them. You are responsible for 
+installing and maintaining these dependencies.
+
+5.3 NO LICENSOR LIABILITY
+The Licensor is NOT responsible for:
+  - Third-party service availability, pricing, or policy changes
+  - Data handling practices of external APIs
+  - Costs or charges from third-party providers
+  - Quality, accuracy, or legality of third-party AI outputs
+  - Installation or configuration of system dependencies
+
+================================================================================
+6. DISCLAIMER OF WARRANTIES
+================================================================================
+
+6.1 "AS IS" SOFTWARE
+THE SOFTWARE IS PROVIDED "AS IS" AND "AS AVAILABLE," WITHOUT WARRANTY OF ANY 
+KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO:
+  - MERCHANTABILITY
+  - FITNESS FOR A PARTICULAR PURPOSE
+  - NON-INFRINGEMENT
+  - ACCURACY OR RELIABILITY OF OUTPUTS
+  - UNINTERRUPTED OR ERROR-FREE OPERATION
+  - SECURITY FROM VULNERABILITIES
+
+6.2 AI-GENERATED CONTENT
+AI-generated outputs (text, images, videos) may be:
+  - Inaccurate, biased, or factually incorrect
+  - Inappropriate or offensive
+  - Subject to copyright or other legal issues
+  - Unpredictable or inconsistent
+
+YOU are responsible for reviewing, validating, and ensuring the legality of 
+all content generated using the Software.
+
+6.3 BETA/ALPHA STATUS
+openElara may include experimental features, beta functionality, or unfinished 
+components. These are provided for testing purposes and may not work as intended.
+
+================================================================================
+7. LIMITATION OF LIABILITY
+================================================================================
+
+7.1 MAXIMUM LIABILITY
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL THE LICENSOR, ITS 
+AFFILIATES, CONTRIBUTORS, OR SUPPLIERS BE LIABLE FOR:
+
+  - DIRECT DAMAGES exceeding $100 USD (or equivalent)
+  - INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES
+  - LOSS OF PROFITS, DATA, GOODWILL, OR BUSINESS OPPORTUNITIES
+  - DAMAGES ARISING FROM USE OR INABILITY TO USE THE SOFTWARE
+  - THIRD-PARTY CLAIMS related to Your use of the Software
+
+This limitation applies EVEN IF the Licensor has been advised of the possibility 
+of such damages, and regardless of the legal theory (contract, tort, negligence, 
+strict liability, etc.).
+
+7.2 JURISDICTIONAL LIMITATIONS
+Some jurisdictions do not allow exclusion or limitation of incidental or 
+consequential damages. In such jurisdictions, the above limitations may not 
+apply to You, and liability will be limited to the maximum extent permitted 
+by law.
+
+================================================================================
+8. INDEMNIFICATION
+================================================================================
+
+You agree to indemnify, defend, and hold harmless the Licensor, its affiliates, 
+contributors, and suppliers from and against any claims, liabilities, damages, 
+losses, costs, or expenses (including reasonable legal fees) arising from:
+
+  - Your use or misuse of the Software
+  - Your violation of this EULA or applicable laws
+  - Your violation of third-party rights (privacy, intellectual property, etc.)
+  - Content You generate, distribute, or publish using the Software
+  - Your commercial derivatives or products based on openElara
+
+================================================================================
+9. UPDATES AND MODIFICATIONS
+================================================================================
+
+9.1 SOFTWARE UPDATES
+The Licensor may release updates, patches, or new versions of the Software. 
+You are encouraged but not required to update. Updates may:
+  - Fix bugs or security vulnerabilities
+  - Add new features or remove old ones
+  - Change functionality or behavior
+  - Be subject to revised EULA terms (You will be notified)
+
+9.2 EULA MODIFICATIONS
+The Licensor reserves the right to modify this EULA at any time. Changes will 
+be posted in the GitHub repository and included in future Software releases.
+
+Continued use of the Software after EULA changes constitutes acceptance of 
+the revised terms. If You do not agree, discontinue use.
+
+================================================================================
+10. TERMINATION
+================================================================================
+
+10.1 TERMINATION BY YOU
+You may terminate this Agreement at any time by uninstalling the Software and 
+deleting all copies in Your possession.
+
+10.2 TERMINATION BY LICENSOR
+The Licensor may terminate Your license if You:
+  - Breach any term of this EULA
+  - Use the Software for illegal or harmful purposes
+  - Create unauthorized commercial derivatives
+  - Fail to comply with commercial licensing requirements
+
+10.3 EFFECT OF TERMINATION
+Upon termination:
+  - Your license to use the Software is revoked
+  - You must cease all use and delete all copies
+  - Sections 3 (IP Rights), 6 (Warranties), 7 (Liability), 8 (Indemnification), 
+    and 11 (Governing Law) survive termination
+
+================================================================================
+11. GOVERNING LAW AND DISPUTE RESOLUTION
+================================================================================
+
+11.1 GOVERNING LAW
+This Agreement is governed by the laws of [JURISDICTION TO BE DETERMINED], 
+without regard to conflict of law principles.
+
+11.2 DISPUTE RESOLUTION
+Any disputes arising from this Agreement shall be resolved through:
+  1. Good-faith negotiation between the parties
+  2. Mediation (if negotiation fails)
+  3. Binding arbitration or litigation in [JURISDICTION TO BE DETERMINED]
+
+11.3 WAIVER OF CLASS ACTIONS
+You agree to resolve disputes individually and waive the right to participate 
+in class actions, class arbitrations, or representative proceedings.
+
+================================================================================
+12. MISCELLANEOUS
+================================================================================
+
+12.1 ENTIRE AGREEMENT
+This EULA, together with the Privacy Policy and LICENSE file, constitutes the 
+entire agreement between You and the Licensor regarding the Software and 
+supersedes all prior agreements or understandings.
+
+12.2 SEVERABILITY
+If any provision of this EULA is found invalid or unenforceable, the remaining 
+provisions remain in full force and effect.
+
+12.3 NO WAIVER
+Failure to enforce any provision does not constitute a waiver of that provision 
+or any other provision.
+
+12.4 ASSIGNMENT
+You may not assign or transfer this Agreement without the Licensor's written 
+consent. The Licensor may assign this Agreement without restriction.
+
+12.5 EXPORT COMPLIANCE
+You are responsible for complying with all applicable export control laws and 
+regulations when using or distributing the Software.
+
+12.6 OPEN SOURCE PHILOSOPHY
+The Licensor believes in open collaboration, transparency, and fair compensation. 
+This EULA is designed to:
+  - Keep the Software FREE for personal and internal business use
+  - Encourage innovation and modification
+  - Ensure fair compensation for commercial success built on this work
+  - Prevent misappropriation or misrepresentation
+
+If You have questions about how this EULA applies to Your use case, please 
+contact us BEFORE proceeding.
+
+================================================================================
+13. CONTACT INFORMATION
+================================================================================
+
+For licensing inquiries, commercial agreements, or EULA questions:
+
+  General Inquiries:  openelara@applymytech.com
+  Support:            support@applymytech.com
+  Commercial Licensing: openelara@applymytech.com
+  GitHub Repository:  [To be added upon public release]
+
+Andrew Quartly
+Apply My Tech
+[Address to be added]
+
+================================================================================
+ACKNOWLEDGMENT
+================================================================================
+
+BY INSTALLING, DOWNLOADING, ACCESSING, OR USING THE SOFTWARE, YOU ACKNOWLEDGE 
+THAT YOU HAVE READ THIS EULA, UNDERSTAND IT, AND AGREE TO BE BOUND BY ITS TERMS.
+
+IF YOU DO NOT AGREE, DO NOT USE THE SOFTWARE.
+
+If You are accepting this EULA on behalf of an organization, You represent that 
+You have the authority to bind that organization to these terms.
+
+================================================================================
+END OF EULA (Placeholder Version - Subject to Legal Review)
+================================================================================

@@ -1,0 +1,17 @@
+{
+    "git.ignoreLimitWarning": true,
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportMissingImports": "none"
+    },
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/pymupdf-stubs",
+        "${workspaceFolder}/pytesseract-stubs",
+        "${workspaceFolder}/fitz-stubs"
+    ],
+    "python.analysis.exclude": [
+        "**/node_modules",
+        "**/__pycache__",
+        ".vscode",
+        "**/extras"
+    ]
+}

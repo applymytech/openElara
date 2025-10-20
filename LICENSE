@@ -1,0 +1,291 @@
+openElara Open Source License
+Version 1.0 (PLACEHOLDER - Subject to Legal Review)
+Last Updated: October 12, 2025
+
+================================================================================
+IMPORTANT LEGAL NOTICE
+================================================================================
+
+This is a PLACEHOLDER license intended for development and testing purposes.
+While it reflects the intended licensing philosophy of openElara, this document
+has NOT been reviewed by qualified legal counsel.
+
+Before public distribution or commercial use, this license MUST be reviewed by
+legal professionals familiar with open-source licensing, intellectual property
+law, and commercial software licensing.
+
+DO NOT rely on this document for actual legal protection without professional
+legal review.
+
+================================================================================
+LICENSE TERMS
+================================================================================
+
+Copyright © 2025 Andrew Quartly trading as Apply My Tech
+All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software for PERSONAL and INTERNAL BUSINESS USE, including without
+limitation the rights to use, copy, modify, merge, publish, and distribute
+copies of the Software for non-commercial purposes, subject to the following
+conditions:
+
+================================================================================
+1. ATTRIBUTION REQUIREMENT
+================================================================================
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+Any distribution, modification, or derivative work must include clear attribution
+to the original author and project:
+
+  "Based on openElara by Andrew Quartly / Apply My Tech"
+  "Original source: [GitHub URL to be added]"
+
+Attribution must be visible in:
+  - Source code comments
+  - User-facing "About" or credits screen
+  - Documentation and README files
+  - Any marketing or promotional materials mentioning the software
+
+================================================================================
+2. PERSONAL USE LICENSE (FREE)
+================================================================================
+
+You are granted a perpetual, worldwide, royalty-free license to:
+  - Use the Software for personal, educational, or research purposes
+  - Modify the Software for personal use
+  - Share modified versions with others for non-commercial purposes
+  - Study, learn from, and build upon the code
+
+No royalties, fees, or permissions are required for personal use.
+
+================================================================================
+3. INTERNAL BUSINESS USE LICENSE (FREE)
+================================================================================
+
+Organizations may use the Software internally without charge, including:
+  - Deployment within an organization for employee use
+  - Modification for internal workflows and processes
+  - Integration with internal systems and tools
+  - Training and development of staff
+
+EXCLUSION: Internal use does NOT include:
+  - Reselling or licensing the Software to external customers
+  - Embedding the Software in products sold to third parties
+  - Offering the Software as a service (SaaS) to external users
+  - Using the Software as a component of a revenue-generating product
+
+================================================================================
+4. COMMERCIAL DERIVATIVE LICENSE (REQUIRES AGREEMENT)
+================================================================================
+
+COMMERCIAL DERIVATIVES are prohibited without a separate licensing agreement.
+
+A "Commercial Derivative" is any work that:
+  - Is sold, licensed, or offered as a paid service to third parties
+  - Generates revenue directly or indirectly from use of this Software
+  - Incorporates substantial portions of the codebase or functionality
+  - Competes with openElara as a commercial offering
+  - Is embedded in a product or service sold to external customers
+
+If you wish to create a commercial derivative, you MUST:
+  1. Contact the copyright holder BEFORE distribution or monetization
+  2. Negotiate a separate Commercial Derivative License
+  3. Agree to royalty terms appropriate to your use case
+
+Contact: openelara@applymytech.com
+
+PHILOSOPHY: The copyright holder's goal is to enable commercial success, not
+prevent it. Royalty structures are designed to be reasonable and revenue-based:
+
+  "We'd rather have 0.1% of $100 million than 90% of nothing."
+
+Early-stage startups, non-profits, and educational institutions may qualify
+for reduced or deferred royalty arrangements.
+
+================================================================================
+5. REUSABLE COMPONENTS LICENSE
+================================================================================
+
+Certain standalone components of openElara may be extracted and used in other
+projects under more permissive terms if they meet ALL of the following criteria:
+
+  - The component is self-contained and does not depend on openElara's core
+  - The component represents less than 5% of openElara's total codebase
+  - The component is clearly documented as reusable (e.g., tokenManager.js)
+  - Proper attribution is provided
+
+EXAMPLES OF POTENTIALLY REUSABLE COMPONENTS:
+  - tokenManager.js (token counting and truncation utilities)
+  - Standalone utility functions clearly marked as reusable
+  - Generic UI components not specific to openElara's functionality
+
+EXAMPLES OF NON-REUSABLE COMPONENTS (Require Commercial License):
+  - RAG system and ChromaDB integration
+  - Character personality system
+  - Multi-modal API orchestration
+  - Ingestion and file processing pipeline
+  - Any component that represents "substantial functionality" of openElara
+
+When in doubt, contact the copyright holder for clarification.
+
+================================================================================
+6. OPEN SOURCE CONTRIBUTIONS
+================================================================================
+
+If you contribute code, documentation, or other materials to the openElara
+project (via pull requests, patches, issues, etc.), you:
+
+  - Retain copyright to your contributions
+  - Grant the copyright holder a perpetual, worldwide, royalty-free license
+    to use, modify, and distribute your contributions as part of openElara
+  - Represent that you have the legal right to make such contributions
+  - Agree your contributions may be sublicensed under this license
+
+Contributions become part of the openElara project and are subject to the
+same licensing terms.
+
+================================================================================
+7. THIRD-PARTY COMPONENTS
+================================================================================
+
+openElara incorporates third-party open-source libraries and components, each
+governed by their respective licenses (see package.json and individual component
+notices).
+
+Your use of those components is subject to their original licenses. This license
+applies only to the original code and components created specifically for
+openElara.
+
+THIRD-PARTY LICENSES INCLUDE (but are not limited to):
+  - Electron: MIT License
+  - Node.js: MIT License
+  - ChromaDB: Apache 2.0 License
+  - React (if used): MIT License
+  - Various npm packages: See package.json and node_modules for details
+
+The copyright holder makes no claim over third-party components and their
+respective licenses apply independently.
+
+================================================================================
+8. NO WARRANTY
+================================================================================
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+This includes but is not limited to:
+  - Accuracy or reliability of AI-generated outputs
+  - Security vulnerabilities or data breaches
+  - Compatibility with third-party services or APIs
+  - Loss of data or business opportunities
+  - Any direct, indirect, incidental, or consequential damages
+
+================================================================================
+9. LIMITATION OF LIABILITY
+================================================================================
+
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE TOTAL LIABILITY OF THE COPYRIGHT
+HOLDER FOR ANY CLAIMS ARISING FROM USE OF THE SOFTWARE SHALL NOT EXCEED
+$100 USD (OR EQUIVALENT).
+
+This limitation applies regardless of the form of action (contract, tort,
+negligence, strict liability, or otherwise) and even if the copyright holder
+has been advised of the possibility of such damages.
+
+================================================================================
+10. EXPORT COMPLIANCE
+================================================================================
+
+You are responsible for complying with all applicable export control laws and
+regulations when using or distributing the Software, including but not limited to:
+  - U.S. Export Administration Regulations (EAR)
+  - International Traffic in Arms Regulations (ITAR)
+  - EU export control regulations
+  - Any other applicable national or international laws
+
+================================================================================
+11. TERMINATION
+================================================================================
+
+This license is perpetual for compliant use. However, your rights under this
+license terminate automatically if you:
+  - Breach any term of this license
+  - Create unauthorized commercial derivatives
+  - Remove or obscure copyright notices or attribution
+  - Use the Software for illegal or harmful purposes
+
+Upon termination, you must cease all use of the Software and destroy all copies
+in your possession.
+
+================================================================================
+12. GOVERNING LAW
+================================================================================
+
+This license is governed by the laws of [JURISDICTION TO BE DETERMINED],
+without regard to conflict of law principles.
+
+Any disputes arising from this license shall be resolved through good-faith
+negotiation, mediation, or binding arbitration in [JURISDICTION TO BE DETERMINED].
+
+================================================================================
+13. INTERPRETATION AND SEVERABILITY
+================================================================================
+
+If any provision of this license is found invalid or unenforceable, the
+remaining provisions remain in full force and effect.
+
+Headings are for convenience only and do not affect interpretation.
+
+In case of ambiguity or conflict between this LICENSE file and the EULA.txt,
+the EULA.txt shall take precedence for end-user software installations. This
+LICENSE file governs source code distribution and modification.
+
+================================================================================
+14. CONTACT INFORMATION
+================================================================================
+
+For licensing questions, commercial agreements, or permissions:
+
+  General Inquiries:       openelara@applymytech.com
+  Commercial Licensing:    openelara@applymytech.com
+  Support:                 support@applymytech.com
+  GitHub Repository:       [To be added upon public release]
+
+Andrew Quartly
+Apply My Tech
+[Address to be added]
+
+================================================================================
+SUMMARY (Non-Binding)
+================================================================================
+
+This license is designed to:
+  ✓ Allow FREE personal use, modification, and sharing
+  ✓ Allow FREE internal business use
+  ✓ Encourage learning, education, and open collaboration
+  ✓ Permit extraction of small reusable components
+  ✓ Require licensing for commercial derivatives that generate revenue
+  ✓ Ensure fair compensation for commercial success built on this work
+  ✓ Prevent misappropriation or misrepresentation
+
+SIMPLE RULE OF THUMB:
+  - Using openElara? FREE
+  - Modifying for yourself? FREE
+  - Using in your company internally? FREE
+  - Selling a product based on openElara? Contact us for commercial license
+
+When in doubt, reach out. We're here to enable your success, not prevent it.
+
+================================================================================
+END OF LICENSE (Placeholder Version - Subject to Legal Review)
+================================================================================

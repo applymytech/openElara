@@ -1,0 +1,37 @@
+{
+  "name": "@openelara/theme-manager",
+  "version": "1.0.0",
+  "description": "AI-driven theme management system for web applications with light/dark modes and custom palette generation",
+  "main": "themeManager.js",
+  "type": "module",
+  "scripts": {
+    "demo": "npx http-server -o demo.html"
+  },
+  "keywords": [
+    "theme",
+    "theme-manager",
+    "ai-theme",
+    "dark-mode",
+    "light-mode",
+    "css-variables",
+    "color-palette",
+    "accessibility"
+  ],
+  "author": "applymytech",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/applymytech/openElara"
+  },
+  "files": [
+    "themeManager.js",
+    "aiThemeGenerator.js",
+    "themeStyles.css",
+    "README.md"
+  ],
+  "exports": {
+    ".": "./themeManager.js",
+    "./ai": "./aiThemeGenerator.js",
+    "./styles": "./themeStyles.css"
+  }
+}

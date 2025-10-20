@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Converter - OpenElara</title>
+    <link rel="stylesheet" href="../assets/styles/style.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            color: #e0e0e0;
+            overflow-y: auto;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        
+        .main-content {
+            min-height: calc(100vh - 40px);
+            padding-bottom: 50px; /* Buffer space at the bottom */
+        }
+
+        .converter-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(30, 30, 30, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        h1 {
+            text-align: center;
+            color: #4a9eff;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #a0a0a0;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        .tab-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #333;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            padding: 12px 24px;
+            background: #2a2a2a;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            color: #a0a0a0;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .tab-button:hover {
+            background: #333;
+            color: #fff;
+        }
+
+        .tab-button.active {
+            background: #4a9eff;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .tab-icon {
+            margin-right: 8px;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .conversion-section {
+            background: #252525;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            color: #4a9eff;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #b0b0b0;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 12px;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 0.95em;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #4a9eff;
+            box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.2);
+        }
+
+        .file-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .file-input-group input[type="text"] {
+            flex: 1;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: #4a9eff;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #357abd;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(74, 158, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: #555;
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: #666;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: #fff;
+            width: 100%;
+            padding: 14px;
+            font-size: 1em;
+            margin-top: 20px;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .slider-group {
+            margin: 20px 0;
+        }
+
+        .slider-group input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #444;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .slider-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4a9eff;
+            cursor: pointer;
+        }
+
+        .slider-group input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4a9eff;
+            cursor: pointer;
+            border: none;
+        }
+
+        .slider-value {
+            display: inline-block;
+            background: #4a9eff;
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .progress-container {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 8px;
+        }
+
+        .progress-container.active {
+            display: block;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4a9eff, #357abd);
+            width: 0%;
+            transition: width 0.3s;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #b0b0b0;
+            font-size: 0.9em;
+        }
+
+        .result-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .result-message.success {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid #28a745;
+            color: #28a745;
+            display: block;
+        }
+
+        .result-message.error {
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid #dc3545;
+            color: #dc3545;
+            display: block;
+        }
+
+        .info-box {
+            background: rgba(74, 158, 255, 0.1);
+            border-left: 4px solid #4a9eff;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #b0b0b0;
+        }
+
+        .format-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .format-badge {
+            background: #2a2a2a;
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.85em;
+            color: #a0a0a0;
+            border: 1px solid #444;
+        }
+
+        .format-badge.active {
+            background: #4a9eff;
+            color: #fff;
+            border-color: #4a9eff;
+        }
+
+        .file-list {
+            max-height: 200px;
+            overflow-y: auto;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 6px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        .file-list-item {
+            padding: 8px;
+            background: #252525;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+        }
+
+        .file-list-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .remove-file {
+            background: #dc3545;
+            color: #fff;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+
+        .remove-file:hover {
+            background: #c82333;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-content">
+        <div class="converter-container">
+            <h1>🔄 File Converter Suite</h1>
+            <p class="subtitle">Convert files between multiple formats with ease</p>
+
+        <!-- Tab Navigation -->
+        <div class="tab-container">
+            <button class="tab-button active" data-tab="image">
+                <span class="tab-icon">🖼️</span>Image Converter
+            </button>
+            <button class="tab-button" data-tab="pdf">
+                <span class="tab-icon">📄</span>PDF Converter
+            </button>
+            <button class="tab-button" data-tab="table">
+                <span class="tab-icon">📊</span>Table Extractor
+            </button>
+            <button class="tab-button" data-tab="text">
+                <span class="tab-icon">📝</span>Text Converter
+            </button>
+        </div>
+
+        <!-- Image Converter Tab -->
+        <div class="tab-content active" id="image-tab">
+            <div class="conversion-section">
+                <div class="section-title">
+                    <span>🖼️</span>
+                    <span>Image Format Conversion</span>
+                </div>
+
+                <div class="info-box">
+                    Convert images between formats: PNG, JPEG, BMP, GIF, TIFF, WEBP, ICO, PDF. Supports batch processing with quality control.
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="image-batch-mode">
+                    <label for="image-batch-mode">Batch Mode (Convert multiple images)</label>
+                </div>
+
+                <div id="image-single-input">
+                    <div class="form-group">
+                        <label>Input Image</label>
+                        <div class="file-input-group">
+                            <input type="text" id="image-input-path" placeholder="Select an image file..." readonly>
+                            <button class="btn btn-secondary" id="image-browse-btn">Browse</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Output Path</label>
+                        <div class="file-input-group">
+                            <input type="text" id="image-output-path" placeholder="Select output location..." readonly>
+                            <button class="btn btn-secondary" id="image-save-btn">Save As</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="image-batch-input" style="display: none;">
+                    <div class="form-group">
+                        <label>Input Images</label>
+                        <button class="btn btn-secondary" id="image-batch-browse-btn" style="width: 100%;">Select Multiple Images</button>
+                        <div class="file-list" id="image-batch-list" style="display: none;"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Output Directory</label>
+                        <div class="file-input-group">
+                            <input type="text" id="image-batch-output-dir" placeholder="Select output folder..." readonly>
+                            <button class="btn btn-secondary" id="image-batch-dir-btn">Browse Folder</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Output Format</label>
+                    <select id="image-output-format">
+                        <option value="png">PNG</option>
+                        <option value="jpg">JPEG</option>
+                        <option value="bmp">BMP</option>
+                        <option value="gif">GIF</option>
+                        <option value="tiff">TIFF</option>
+                        <option value="webp">WEBP</option>
+                        <option value="ico">ICO</option>
+                        <option value="pdf">PDF</option>
+                    </select>
+                </div>
+
+                <div class="slider-group">
+                    <label>Quality (for JPEG/WEBP): <span class="slider-value" id="image-quality-value">95</span></label>
+                    <input type="range" id="image-quality-slider" min="1" max="100" value="95">
+                </div>
+
+                <button class="btn btn-success" id="convert-image-btn">
+                    <span>🔄 Convert Image(s)</span>
+                </button>
+
+                <div class="progress-container" id="image-progress">
+                    <div class="progress-text">Converting...</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="result-message" id="image-result"></div>
+            </div>
+        </div>
+
+        <!-- PDF Converter Tab -->
+        <div class="tab-content" id="pdf-tab">
+            <div class="conversion-section">
+                <div class="section-title">
+                    <span>📄</span>
+                    <span>PDF Document Conversion</span>
+                </div>
+
+                <div class="info-box">
+                    Convert PDF documents to Markdown or DOCX format. OCR support for scanned PDFs.
+                </div>
+
+                <div class="form-group">
+                    <label>Input PDF</label>
+                    <div class="file-input-group">
+                        <input type="text" id="pdf-input-path" placeholder="Select a PDF file..." readonly>
+                        <button class="btn btn-secondary" id="pdf-browse-btn">Browse</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Output Format</label>
+                    <select id="pdf-output-format">
+                        <option value="markdown">Markdown (.md)</option>
+                        <option value="docx">Word Document (.docx)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Output Path</label>
+                    <div class="file-input-group">
+                        <input type="text" id="pdf-output-path" placeholder="Select output location..." readonly>
+                        <button class="btn btn-secondary" id="pdf-save-btn">Save As</button>
+                    </div>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="pdf-use-ocr">
+                    <label for="pdf-use-ocr">Enable OCR (for scanned/image-based PDFs)</label>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="pdf-clean-format" checked>
+                    <label for="pdf-clean-format">Auto-format text (headings, bullets)</label>
+                </div>
+
+                <button class="btn btn-success" id="convert-pdf-btn">
+                    <span>🔄 Convert PDF</span>
+                </button>
+
+                <div class="progress-container" id="pdf-progress">
+                    <div class="progress-text">Converting...</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="result-message" id="pdf-result"></div>
+            </div>
+        </div>
+
+        <!-- Table Extractor Tab -->
+        <div class="tab-content" id="table-tab">
+            <div class="conversion-section">
+                <div class="section-title">
+                    <span>📊</span>
+                    <span>PDF Table Extraction</span>
+                </div>
+
+                <div class="info-box">
+                    Extract tables from PDF documents to CSV or Excel format. All tables will be saved as separate files.
+                </div>
+
+                <div class="form-group">
+                    <label>Input PDF</label>
+                    <div class="file-input-group">
+                        <input type="text" id="table-input-path" placeholder="Select a PDF file..." readonly>
+                        <button class="btn btn-secondary" id="table-browse-btn">Browse</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Output Format</label>
+                    <select id="table-output-format">
+                        <option value="csv">CSV (.csv)</option>
+                        <option value="xlsx">Excel (.xlsx)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Output Directory</label>
+                    <div class="file-input-group">
+                        <input type="text" id="table-output-dir" placeholder="Select output folder..." readonly>
+                        <button class="btn btn-secondary" id="table-dir-btn">Browse Folder</button>
+                    </div>
+                </div>
+
+                <button class="btn btn-success" id="extract-tables-btn">
+                    <span>📊 Extract Tables</span>
+                </button>
+
+                <div class="progress-container" id="table-progress">
+                    <div class="progress-text">Extracting tables...</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="result-message" id="table-result"></div>
+            </div>
+        </div>
+
+        <!-- Text Converter Tab -->
+        <div class="tab-content" id="text-tab">
+            <div class="conversion-section">
+                <div class="section-title">
+                    <span>📝</span>
+                    <span>Text File Conversion</span>
+                </div>
+
+                <div class="info-box">
+                    Convert between text formats: TXT, Markdown, HTML, RTF, DOCX. Uses Markdown as intermediary for better formatting preservation.
+                </div>
+
+                <div class="form-group">
+                    <label>Input File</label>
+                    <div class="file-input-group">
+                        <input type="text" id="text-input-path" placeholder="Select a text file..." readonly>
+                        <button class="btn btn-secondary" id="text-browse-btn">Browse</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Output Format</label>
+                    <select id="text-output-format">
+                        <option value="txt">Plain Text (.txt)</option>
+                        <option value="md">Markdown (.md)</option>
+                        <option value="html">HTML (.html)</option>
+                        <option value="docx">Word Document (.docx)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Output Path</label>
+                    <div class="file-input-group">
+                        <input type="text" id="text-output-path" placeholder="Select output location..." readonly>
+                        <button class="btn btn-secondary" id="text-save-btn">Save As</button>
+                    </div>
+                </div>
+
+                <button class="btn btn-success" id="convert-text-btn">
+                    <span>🔄 Convert Text File</span>
+                </button>
+
+                <div class="progress-container" id="text-progress">
+                    <div class="progress-text">Converting...</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="result-message" id="text-result"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="file-converter.js"></script>
+</div> <!-- main-content -->
+    </body>
+
+</html>

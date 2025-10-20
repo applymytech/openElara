@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shimeji Pet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: transparent;
+        }
+        
+        #pet-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            cursor: grab;
+            /* Only respond to events within the pet sprite area */
+            pointer-events: none;
+            /* Ensure transparent background */
+            background: transparent;
+        }
+        
+        #pet-container.dragging {
+            cursor: grabbing;
+        }
+        
+        #pet-sprite {
+            width: 128px;
+            height: 128px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            image-rendering: pixelated;
+            pointer-events: all;
+        }
+
+        #grab-handle {
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 28px;
+            height: 8px;
+            border-radius: 6px;
+            background: rgba(0,0,0,0.25);
+            border: 1px solid rgba(255,255,255,0.15);
+            cursor: grab;
+            z-index: 9999;
+            opacity: 0.0;
+            transition: opacity 160ms ease-in-out;
+            /* Only respond to events when visible */
+            pointer-events: none;
+        }
+
+        #pet-container:hover #grab-handle {
+            pointer-events: auto;
+        }
+
+        #pet-container:hover #grab-handle {
+            opacity: 1.0;
+        }
+
+        /* visual feedback when pet is picked up */
+        #pet-container.picked {
+            transform: scale(1.02);
+            transition: transform 120ms ease-out;
+            filter: drop-shadow(0 8px 12px rgba(0,0,0,0.35));
+        }
+        
+        .chat-bubble {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-10px);
+            background: #FFE4E1;
+            color: #2C3E50;
+            border: 2px solid #FF69B4;
+            border-radius: 15px;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 200px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            pointer-events: none;
+            z-index: 10000;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .chat-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid #FF69B4;
+        }
+        
+        .chat-bubble.fade-in {
+            animation: bubbleFadeIn 0.3s ease-out;
+        }
+        
+        .chat-bubble.fade-out {
+            animation: bubbleFadeOut 0.3s ease-in;
+        }
+        
+        @keyframes bubbleFadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(0px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(-10px);
+            }
+        }
+        
+        @keyframes bubbleFadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-5px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="pet-container">
+        <div id="grab-handle" title="Grab and move"></div>
+        <img id="pet-sprite" src="" alt="Pet">
+    </div>
+    
+    <script src="petRenderer.js"></script>
+</body>
+</html>

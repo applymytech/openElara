@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account & Configuration</title>
+    <link rel="stylesheet" href="../assets/styles/style.css">
+<style>
+    body.account-page {
+        overflow-y: auto;
+        align-items: flex-start; /* FIX: Align content to the top */
+        padding-top: 2rem; /* Add some space at the top */
+    }
+    .account-section { margin-bottom: 20px; padding: 15px; background: var(--secondary-bg-color); border-radius: 8px; border-left: 4px solid var(--accent-color); }
+    .account-section input { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--tertiary-bg-color); color: var(--main-text-color); }
+    #usernameDisplay { display: flex; justify-content: space-between; align-items: center; }
+    .welcome-subheader { margin-bottom: 20px; padding: 15px; background: var(--secondary-bg-color); border-radius: 8px; text-align: center; font-size: 1.1em; color: var(--accent-color); }
+    .api-list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid var(--border-color); }
+    #installed-ollama-models-list, #custom-apis-list { margin-top: 15px; max-height: 180px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 4px; padding: 10px; background-color: var(--tertiary-bg-color); }
+    .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; } /* New: Grid layout for keys */
+
+
+    /* SURGICAL FIX (ACCOUNT_TABS_BROKEN): Add core CSS for tab functionality. */
+    .tab-panel {
+        display: none; /* Hide all panels by default */
+        max-height: calc(100vh - 250px); /* Prevent content from covering tabs */
+        overflow-y: auto; /* Enable scrolling for long content */
+        padding-bottom: 20px; /* Space at bottom */
+    }
+    .tab-panel.active {
+        display: block; /* Show only the active panel */
+    }
+    .tab-btn {
+        border-bottom: 2px solid transparent; /* Style for inactive tabs */
+        padding: 10px 15px; /* Better clickable area */
+        cursor: pointer; /* Show it's clickable */
+        background: transparent;
+        color: var(--main-text-color);
+        border: none;
+        font-size: 0.95em;
+        transition: all 0.2s ease;
+    }
+    .tab-btn:hover {
+        background: var(--secondary-bg-color);
+        color: var(--accent-color);
+    }
+    .tab-btn.active {
+        border-bottom: 2px solid var(--accent-color); /* Highlight for the active tab */
+        color: var(--accent-color);
+        font-weight: 600;
+    }
+    .tab-navigation {
+        display: flex;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 1rem;
+        position: sticky; /* Keep tabs visible when scrolling */
+        top: 0;
+        background: var(--primary-bg-color);
+        z-index: 100; /* Stay above content */
+        flex-wrap: wrap; /* Allow wrapping on small screens */
+    }
+</style>
+</head>
+<body class="account-page theme-active">
+    <div class="container">
+        <div id="accountContainer" class="account-dashboard-wrapper">
+            <div class="account-header">
+                <h1>Account & Configuration</h1>
+            </div>
+
+            <div class="tab-navigation">
+                <button class="tab-btn active" data-tab="user">User Info</button>
+                <button class="tab-btn" data-tab="keys">Global LLM & Tool Keys</button>
+                <button class="tab-btn" data-tab="generative">Generative Models</button>
+                <button class="tab-btn" data-tab="local">Local Models (Ollama)</button>
+                <button class="tab-btn" data-tab="custom">Custom Chat APIs</button>
+                <button class="tab-btn" data-tab="pet">🐾 Desktop Pet</button>
+            </div>
+
+            <div id="accountInfo">
+                <div id="tab-user" class="tab-panel active">
+                    <div id="username-input-section" class="account-section">
+                        <h3>Set Your Username</h3>
+                        <p>This is the name the AI will use to address you.</p>
+                        <input type="text" id="usernameInput" placeholder="Enter your name" maxlength="50">
+                        <button id="saveUsernameBtn" class="btn-primary">Save Username</button>
+                    </div>
+                    <div id="usernameDisplay" class="hidden account-section">
+                        <p>Username: <span id="userName" style="font-weight: bold; color: var(--accent-color);"></span></p>
+                        <button id="changeUsernameBtn" class="btn-secondary">Change</button>
+                    </div>
+                    
+                    <div id="character-selection-section" class="account-section">
+                        <h3>Active AI Companion</h3>
+                        <p>Select which AI companion personality you want to interact with. Changes take effect immediately.</p>
+                        
+                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                            <img id="character-avatar" src="" alt="Character Avatar" style="width: 64px; height: 64px; border-radius: 50%; border: 2px solid var(--accent-color); margin-right: 15px; object-fit: cover;">
+                            <div>
+                                <h4 id="character-display-name" style="margin: 0; color: var(--accent-color); font-size: 1.2em;">Loading...</h4>
+                                <p id="character-description" style="margin: 5px 0 0 0; color: var(--secondary-text-color); font-size: 0.9em;">Loading character info...</p>
+                            </div>
+                        </div>
+                        
+                        <label for="character-select">Choose Character:</label>
+                        <select id="character-select" style="width: 100%; padding: 10px; margin-top: 10px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--tertiary-bg-color); color: var(--main-text-color); font-size: 1em;">
+                            <option value="">Loading characters...</option>
+                        </select>
+                        <p id="character-status" style="margin-top: 10px; font-style: italic; color: var(--secondary-text-color);"></p>
+                    </div>
+                </div>
+
+                <div id="tab-keys" class="tab-panel">
+                    <div class="account-section">
+                        <h3>LLM & Utility API Keys</h3>
+                        <p>These keys are stored securely and used by the core application functions.</p>
+                        <div class="config-grid">
+                            <div>
+                                <div class="form-group"><label for="ollama-base-url">Ollama Base URL</label><input type="text" id="ollama-base-url" placeholder="Default: http://localhost:11434"></div>
+                                <div class="form-group"><label for="together-api-key">TogetherAI API Key</label><input type="password" id="together-api-key" placeholder="For chat and images"></div>
+                            </div>
+                            <div>
+                                <div class="form-group"><label for="exa-api-key">Exa.ai API Key</label><input type="password" id="exa-api-key" placeholder="For web research"></div>
+                                <div class="form-group">
+                                    <label for="aiml-api-key">AI/ML API Key</label>
+                                    <input type="password" id="aiml-api-key" placeholder="For video generation">
+                                </div>
+                                <div class="form-group">
+                                    <label for="deepai-api-key">DeepAI API Key</label>
+                                    <input type="password" id="deepai-api-key" placeholder="For background-removal and DeepAI image generation">
+                                </div>
+                            </div>
+                        </div>
+                        <button id="save-keys-btn" class="btn-primary">Save Global Keys</button>
+                    </div>
+                </div>
+
+                <div id="tab-generative" class="tab-panel">
+                    <div id="generative-api-image-section" class="account-section">
+                        <h3>🎨 Image Generation Configuration</h3>
+                        <p>Configure custom image generation endpoints. Add your own models or override default settings.</p>
+                        
+                        <div class="form-group">
+                            <label for="image-gen-base-url">Default Image Completions Endpoint</label>
+                            <input type="text" id="image-gen-base-url" value="https://api.together.xyz/v1/images/generations" placeholder="https://api.together.xyz/v1/images/generations">
+                            <small style="color: var(--secondary-text-color);">Uses TogetherAI API Key from Global Keys tab</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="image-gen-key-override">API Key Override (Optional)</label>
+                            <input type="password" id="image-gen-key-override" placeholder="Leave blank to use TogetherAI API Key">
+                            <small style="color: var(--secondary-text-color);">Override the default key for image generation</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="selfie-image-route">🤳 Selfie Image Route (Optional)</label>
+                            <select id="selfie-image-route" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--tertiary-bg-color); color: var(--main-text-color);">
+                                <option value="default">Use Default (TogetherAI)</option>
+                                <option value="custom">Use Custom Endpoint Below</option>
+                            </select>
+                            <input type="text" id="selfie-image-custom-url" placeholder="https://your-api.com/v1/images/generations" style="margin-top: 8px; display: none;">
+                            <small style="color: var(--secondary-text-color);">Custom route for character selfie generation</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="image-add-custom-models-checkbox">
+                                Add Custom Image Models
+                            </label>
+                            <small style="color: var(--secondary-text-color);">Define your own models with custom parameters</small>
+                        </div>
+                        
+                        <div id="custom-image-models-section" style="display: none; margin-top: 15px; padding: 15px; background: var(--tertiary-bg-color); border-radius: 4px;">
+                            <h4>Add Custom Image Model</h4>
+                            <div class="form-group">
+                                <label for="custom-image-model-id">Model ID</label>
+                                <input type="text" id="custom-image-model-id" placeholder="e.g., my-provider/my-image-model">
+                            </div>
+                            <div class="form-group">
+                                <label for="custom-image-model-name">Display Name</label>
+                                <input type="text" id="custom-image-model-name" placeholder="e.g., My Custom Image Model">
+                            </div>
+                            <div class="form-group">
+                                <label for="custom-image-model-endpoint">Endpoint URL (Optional)</label>
+                                <input type="text" id="custom-image-model-endpoint" placeholder="Leave blank to use default endpoint">
+                            </div>
+                            <div class="form-group">
+                                <label for="custom-image-model-payload">Custom Payload JSON (Optional)</label>
+                                <textarea id="custom-image-model-payload" rows="5" style="width: 100%; padding: 8px; font-family: monospace; border: 1px solid var(--border-color); border-radius: 4px; background: var(--tertiary-bg-color); color: var(--main-text-color);" placeholder='{"custom_param": "value", "brand_specific": true}'></textarea>
+                                <small style="color: var(--secondary-text-color);">Additional JSON fields to merge into API requests (e.g., brand-specific parameters)</small>
+                            </div>
+                            <button id="add-custom-image-model-btn" class="btn-secondary">Add Model</button>
+                            <div id="custom-image-models-list" style="margin-top: 10px;"></div>
+                        </div>
+                        
+                        <button id="save-image-gen-settings" class="btn-primary" style="margin-top: 15px;">Save Image Settings</button>
+                    </div>
+                    
+                    <div id="generative-api-video-section" class="account-section">
+                        <h3>🎬 Video Generation Configuration</h3>
+                        <p>Configure custom video generation endpoints. Add your own models or override default settings.</p>
+                        
+                        <div class="form-group">
+                            <label for="video-gen-base-url">Default Video Endpoint</label>
+                            <input type="text" id="video-gen-base-url" value="https://api.aimlapi.com/v2/video/generations" placeholder="https://api.aimlapi.com/v2/video/generations">
+                            <small style="color: var(--secondary-text-color);">Uses AI/ML API Key from Global Keys tab</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="video-gen-key-override">API Key Override (Optional)</label>
+                            <input type="password" id="video-gen-key-override" placeholder="Leave blank to use AI/ML API Key">
+                            <small style="color: var(--secondary-text-color);">Override the default key for video generation</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="selfie-video-route">🤳 Selfie Video Route (Optional)</label>
+                            <select id="selfie-video-route" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--tertiary-bg-color); color: var(--main-text-color);">
+                                <option value="default">Use Default (AI/ML API)</option>
+                                <option value="custom">Use Custom Endpoint Below</option>
+                            </select>
+                            <input type="text" id="selfie-video-custom-url" placeholder="https://your-api.com/v2/video/generations" style="margin-top: 8px; display: none;">
+                            <small style="color: var(--secondary-text-color);">Custom route for character selfie videos</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="video-add-custom-models-checkbox">
+                                Add Custom Video Models
+                            </label>
+                            <small style="color: var(--secondary-text-color);">Define your own models with custom parameters</small>
+                        </div>
+                        
+                        <div id="custom-video-models-section" style="display: none; margin-top: 15px; padding: 15px; background: var(--tertiary-bg-color); border-radius: 4px;">
+                            <h4>Add Custom Video Model</h4>
+                            <div class="form-group">
+                                <label for="custom-video-model-id">Model ID</label>
+                                <input type="text" id="custom-video-model-id" placeholder="e.g., my-provider/my-video-model">
+                            </div>
+                            <div class="form-group">
+                                <label for="custom-video-model-name">Display Name</label>
+                                <input type="text" id="custom-video-model-name" placeholder="e.g., My Custom Video Model">
+                            </div>
+                            <div class="form-group">
+                                <label for="custom-video-model-endpoint">Endpoint URL</label>
+                                <input type="text" id="custom-video-model-endpoint" placeholder="https://your-api.com/v2/video/generations">
+                            </div>
+                            <div class="form-group">
+                                <label for="custom-video-model-payload">Custom Payload JSON (Optional)</label>
+                                <textarea id="custom-video-model-payload" rows="5" style="width: 100%; padding: 8px; font-family: monospace; border: 1px solid var(--border-color); border-radius: 4px; background: var(--tertiary-bg-color); color: var(--main-text-color);" placeholder='{"enhance_prompt": true, "brand_specific_param": "value"}'></textarea>
+                                <small style="color: var(--secondary-text-color);">Additional JSON fields to merge into API requests (e.g., provider-specific parameters)</small>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="custom-video-model-t2v">
+                                    Supports Text-to-Video (T2V)
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="custom-video-model-i2v">
+                                    Supports Image-to-Video (I2V)
+                                </label>
+                            </div>
+                            <button id="add-custom-video-model-btn" class="btn-secondary">Add Model</button>
+                            <div id="custom-video-models-list" style="margin-top: 10px;"></div>
+                        </div>
+                        
+                        <button id="save-video-gen-settings" class="btn-primary" style="margin-top: 15px;">Save Video Settings</button>
+                    </div>
+                </div>
+
+                <div id="tab-local" class="tab-panel">
+                    <div class="account-section">
+                        <h3>Local LLM Management (Ollama)</h3>
+                        <p>Discover, download, and manage local models. Ollama must be running on your computer.</p>
+                        <div class="form-group"><button id="browseOllamaLibraryBtn" class="btn-secondary">Browse Full Ollama Library</button></div>
+                        <div class="form-group">
+                            <label for="ollamaModelNameInput">Download a New Model</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" id="ollamaModelNameInput" placeholder="e.g., llama3:8b" style="flex-grow: 1;"><button id="downloadOllamaModelBtn" class="btn-primary">Download</button>
+                            </div>
+                        </div>
+                        <div id="ollama-progress-container" class="hidden" style="margin-top: 10px; font-family: monospace; background: var(--tertiary-bg-color); padding: 10px; border-radius: 4px; max-height: 150px; overflow-y: auto;"></div>
+                        <div class="form-group" style="margin-top: 20px;">
+                            <label>Installed Local Models</label>
+                            <div id="installed-ollama-models-list"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="tab-custom" class="tab-panel">
+                    <div id="custom-api-section" class="account-section">
+                        <h3>Custom API Connections (openai network compatible)</h3>
+                        <p>Manually configure alternative text-based LLM providers.</p>
+                        <div class="form-group"><label for="apiNameInput">Provider Name</label><input type="text" id="apiNameInput" placeholder="e.g., My Custom API"></div>
+                        <div class="form-group"><label for="apiKeyInput">API Key</label><input type="password" id="apiKeyInput" placeholder="Enter your secret API key"></div>
+                        <div class="form-group"><label for="apiCompletionsUrlInput">Chat Completions URL</label><input type="text" id="apiCompletionsUrlInput" placeholder="e.g., https://api.example.com/v1/chat/completions"></div>
+                        <div class="form-group"><label for="apiModelsUrlInput">Models List URL</label><input type="text" id="apiModelsUrlInput" placeholder="e.g., https://api.example.com/v1/models"></div>
+                        <div class="form-group">
+                            <label for="apiCustomPayloadInput">Custom Payload JSON (Optional)</label>
+                            <textarea id="apiCustomPayloadInput" rows="4" style="width: 100%; padding: 8px; font-family: monospace; border: 1px solid var(--border-color); border-radius: 4px; background: var(--tertiary-bg-color); color: var(--main-text-color);" placeholder='{"extra_param": "value", "custom_setting": true}'></textarea>
+                            <small style="color: var(--secondary-text-color);">Additional JSON fields to merge into API requests (e.g., provider-specific parameters)</small>
+                        </div>
+                        <div style="text-align: center; margin-top: 15px;">
+                            <button id="addApiBtn" class="btn-primary">Add API Connection</button>
+                        </div>
+                        <div id="custom-apis-list" style="margin-top: 15px;"></div>
+                    </div>
+                </div>
+
+                <div id="tab-pet" class="tab-panel">
+                    <div class="account-section">
+                        <h3>🐾 Desktop Pet Companion</h3>
+                        <p>Launch a desktop pet that roams your screen with physics-based movement! (Beta Feature)</p>
+                        
+                        <div class="form-group">
+                            <label for="pet-character-select">Character to Launch:</label>
+                            <select id="pet-character-select" style="width: 100%; padding: 10px; margin-top: 10px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--tertiary-bg-color); color: var(--main-text-color); font-size: 1em;">
+                                <option value="">Loading characters...</option>
+                            </select>
+                        </div>
+                        
+                        <div id="pet-status" style="margin-top: 15px; padding: 15px; background: var(--tertiary-bg-color); border-radius: 4px; border-left: 4px solid var(--accent-color);">
+                            <p><strong>Status:</strong> <span id="pet-status-text">No pet active</span></p>
+                            <p style="margin-top: 5px; font-size: 0.9em; color: var(--secondary-text-color);">
+                                <strong>Note:</strong> You need to generate sprite assets for your character first. Use the "Generate Sprites" button below.
+                            </p>
+                        </div>
+                        
+                        <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button id="generate-pet-sprites-btn" class="btn-secondary" disabled>
+                                🎨 Generate Sprites ($0.58)
+                            </button>
+                            <button id="launch-pet-btn" class="btn-primary" disabled>
+                                🚀 Launch Pet
+                            </button>
+                            <button id="close-pet-btn" class="btn-secondary" disabled>
+                                ❌ Close Pet
+                            </button>
+                            <button id="pet-say-hello-btn" class="btn-secondary" disabled>
+                                💬 Say Hello
+                            </button>
+                        </div>
+                        
+                        <div style="margin-top: 30px; padding: 15px; background: var(--secondary-bg-color); border-radius: 8px;">
+                            <h4 style="margin-bottom: 10px;">How It Works:</h4>
+                            <ol style="line-height: 1.8; color: var(--secondary-text-color);">
+                                <li><strong>Generate Sprites:</strong> Creates 23 sprite images for your character ($0.58 via FLUX)</li>
+                                <li><strong>Launch Pet:</strong> Opens a transparent window with your character</li>
+                                <li><strong>Physics:</strong> Pet walks, climbs screen edges, falls with gravity</li>
+                                <li><strong>Drag:</strong> Click and drag your pet anywhere</li>
+                                <li><strong>Chat:</strong> Click "Say Hello" to make your pet talk</li>
+                            </ol>
+                            <p style="margin-top: 15px; font-style: italic; color: var(--secondary-text-color);">
+                                ⚠️ <strong>Beta Feature:</strong> Sprite generation takes ~5-10 minutes with approval checkpoints. 
+                                You can pause/resume at any time.
+                            </p>
+                        </div>
+
+                        <div id="saved-pets-section" style="margin-top:20px; padding:15px; background:var(--tertiary-bg-color); border-radius:8px;">
+                            <h4>Saved Pets</h4>
+                            <div id="saved-pets-list" style="max-height:200px; overflow-y:auto; border:1px solid var(--border-color); padding:8px; background:var(--primary-bg-color);"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="launch-actions account-section">
+                    <button id="startAppBtn" class="btn btn-primary" disabled>Start App</button>
+                </div>
+            </div>      
+        </div>
+    </div>
+    <script src="account.js"></script>
+</body>
+</html>

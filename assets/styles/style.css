@@ -1,0 +1,970 @@
+/*
+ * CONSOLIDATED AND RESTORED STYLESHEET for openElara
+ * Based on the original 2500-line file to restore all component styling.
+ * Includes fixes for Account Tabs, I2V Visibility, and other regressions.
+ */
+
+/* ==========================================================================
+   1. BASE, THEME & RESET
+   ========================================================================== */
+
+/* DEFAULT THEME VARIABLES - Fallbacks on :root */
+:root {
+  --main-bg-color: #1e1e1e;
+  --secondary-bg-color: #252526;
+  --tertiary-bg-color: #3c3c3c;
+  --button-bg-color: #444;
+  --button-hover-bg-color: #555;
+  --border-color: #3c3c3c;
+  --main-text-color: #d4d4d4;
+  --secondary-text-color: #a0a0a0;
+  --accent-color: #0e639c;
+  --accent-color-hover: #1177bb;
+  --message-user-bg: #0e639c;
+  --message-ai-bg: #2d2d30;
+  --accent-contrast-text-color: #ffffff;
+  --code-block-bg: #282c34;
+  --error-color: #e74c3c;
+  --success-color: #2ecc71;
+  --link-color: #6a9ec5;
+  --highlight-color: #FFD700;
+  --spinner-base-color: #3c3c3c;
+  --shadow-color-rgba: rgba(0, 0, 0, 0.4);
+  --hug-color: #ffc107;
+  --punch-color: #dc3545;
+  --high-five-color: #28a745;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+  background-color: var(--main-bg-color);
+  color: var(--main-text-color);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Ensure all text elements inherit color properly */
+p, span, div, h1, h2, h3, h4, h5, h6, 
+a, li, td, th, dt, dd, blockquote {
+  color: inherit;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Dark theme uses :root defaults. Light theme overrides below. 
+   Custom themes remove these classes and set :root with !important. */
+
+body.theme-active.light-theme {
+  /* Light theme overrides - moved to :root with class-based JS toggling */
+  --main-bg-color: #f5f5f5;
+  --secondary-bg-color: #ffffff;
+  --tertiary-bg-color: #e9ecef;
+  --button-bg-color: #e0e0e0;
+  --button-hover-bg-color: #d0d0d0;
+  --border-color: #ccc;
+  --main-text-color: #222;
+  --secondary-text-color: #555;
+  --accent-color: #007bff;
+  --accent-color-hover: #0056b3;
+  --message-user-bg: #007bff;
+  --message-ai-bg: #e9ecef;
+  --accent-contrast-text-color: #ffffff;
+  --code-block-bg: #f8f9fa;
+  --error-color: #f8d7da;
+  --success-color: #d4edda;
+  --link-color: #0056b3;
+  --highlight-color: #e6b400;
+  --spinner-base-color: #e0e0e0;
+  --shadow-color-rgba: rgba(0, 0, 0, 0.1);
+  --hug-color: #ffc107;
+  --punch-color: #dc3545;
+  --high-five-color: #28a745;
+}
+
+/* ==========================================================================
+   2. BUTTONS & UTILITY CLASSES
+   ========================================================================== */
+.btn-primary, .btn-secondary, .file-btn, .command-btn {
+  border: none;
+  border-radius: 5px;
+  padding: 12px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+.btn-primary { background-color: var(--accent-color); color: white; }
+.btn-primary:hover { background-color: var(--accent-color-hover); }
+.btn-secondary { background-color: var(--button-bg-color); color: var(--main-text-color); }
+.btn-secondary:hover { background-color: var(--button-hover-bg-color); }
+.btn-danger-outline { 
+    background-color: transparent; 
+    color: var(--error-color); 
+    border: 1px solid var(--error-color); 
+}
+.btn-danger-outline:hover { 
+    background-color: var(--error-color); 
+    color: var(--main-bg-color); 
+}
+.file-btn { padding: 5px 12px; border: 1px solid var(--border-color); font-size: 12px; }
+.command-btn { padding: 10px; font-size: 16px; border: 1px solid var(--border-color); }
+.top-button-group { display: flex; justify-content: flex-end; gap: 10px; }
+.button-group { display: flex; align-items: center; gap: 10px; padding: 4px 8px; border: 1px solid var(--tertiary-bg-color); border-radius: 6px; }
+.group-label { font-size: 10px; font-weight: bold; color: var(--secondary-text-color); text-transform: uppercase; white-space: nowrap; }
+
+/* ==========================================================================
+   3. MAIN APP LAYOUT (index.html)
+   ========================================================================== */
+
+#top-clusters-container {
+  padding: 8px 12px;
+  background-color: var(--secondary-bg-color);
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center the clusters */
+  gap: 15px; 
+  flex-wrap: wrap; 
+}
+
+/* New Flex container for Sidebar + Chat */
+#main-content-container {
+    display: flex;
+    flex-grow: 1;
+    overflow: hidden; /* Prevent main scrollbar */
+}
+
+/* Sidebar Styling */
+#sidebar {
+    width: 200px; /* Fixed width for the sidebar */
+    flex-shrink: 0;
+    background-color: var(--secondary-bg-color);
+    border-right: 1px solid var(--border-color);
+    padding: 10px;
+    overflow-y: auto; /* Scrollable sidebar */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.sidebar-section {
+    padding: 0;
+    border-bottom: 1px dashed var(--border-color);
+}
+
+.sidebar-section:last-child {
+    border-bottom: none;
+}
+
+/* Collapsible Sidebar Sections */
+.sidebar-section.collapsible .sidebar-section-header {
+    cursor: pointer;
+    user-select: none;
+    padding: 10px 8px;
+    margin: 0;
+    color: var(--main-text-color);
+    font-size: 12px;
+    text-transform: none;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.sidebar-section.collapsible .sidebar-section-header:hover {
+    background-color: var(--tertiary-bg-color);
+}
+
+.sidebar-section.collapsible .collapse-icon {
+    font-size: 10px;
+    transition: transform 0.2s;
+}
+
+.sidebar-section.collapsible.collapsed .collapse-icon {
+    transform: rotate(0deg);
+}
+
+.sidebar-section.collapsible:not(.collapsed) .collapse-icon {
+    transform: rotate(0deg);
+}
+
+.sidebar-section-content {
+    padding: 5px 0 10px 0;
+    transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+.sidebar-section.collapsed .sidebar-section-content {
+    display: none;
+}
+
+.sidebar-section h4 {
+    color: var(--secondary-text-color);
+    margin-bottom: 8px;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.sidebar-btn {
+    display: block;
+    width: 100%;
+    margin-bottom: 5px;
+    padding: 8px 12px;
+    text-align: left;
+    background-color: var(--button-bg-color);
+    color: var(--main-text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.1s;
+    font-size: 13px;
+}
+
+.sidebar-btn:hover {
+    background-color: var(--button-hover-bg-color);
+}
+
+/* Chat Main Area (Takes remaining space) */
+#chat-main-area {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Chat history handles its own scrolling */
+}
+
+/* Theme button container in the sidebar, styled to look like a button */
+#theme-controls-container-sidebar {
+    position: relative;
+}
+
+/* Token manager clusters and stats remain as is */
+.token-manager-collapsible { background-color: var(--secondary-bg-color); border: 1px solid var(--border-color); border-radius: 4px; }
+.token-manager-summary { padding: 10px; font-weight: bold; cursor: pointer; list-style: none; }
+.token-manager-summary::-webkit-details-marker { display: none; }
+.token-allocator-container { display: flex; flex-direction: column; gap: 8px; padding: 10px; border-top: 1px solid var(--border-color); }
+.model-context-stats { display: flex; flex-wrap: wrap; gap: 10px; padding: 10px; font-size: 12px; color: var(--secondary-text-color); justify-content: center; }
+/* ==========================================================================
+   4. CHAT HISTORY & MESSAGING
+   ========================================================================== */
+
+#chat-history { flex-grow: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+.message { padding: 12px 18px; border-radius: 18px; max-width: 85%; line-height: 1.5; }
+.user-message { background-color: var(--message-user-bg); color: var(--main-text-color); align-self: flex-end; border-bottom-right-radius: 4px; }
+.ai-message { background-color: var(--message-ai-bg); color: var(--main-text-color); border: 1px solid var(--border-color); align-self: flex-start; border-bottom-left-radius: 4px; }
+
+/* Thinking placeholder bubble */
+.thinking-bubble .message-content::after {
+  content: '...';
+  display: inline-block;
+  animation: dots 1.4s infinite steps(4, end);
+  width: 2.4em;
+  text-align: left;
+}
+@keyframes dots {
+  0%, 20% { content: '.'; }
+  40% { content: '...'; }
+  60% { content: '......'; }
+  80%, 100% { content: '........'; }
+}
+
+.message-content pre { background-color: var(--code-block-bg) !important; border: 1px solid var(--border-color) !important; border-radius: 5px; padding: 12px; margin: 8px 0; overflow-x: auto; white-space: pre-wrap; word-break: break-word; font-family: "SFMono-Regular", Consolas, monospace; }
+.message-content code { background-color: var(--tertiary-bg-color); padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, monospace; }
+
+/* Code Object / Prompt Object / Action Object Styling (Unified Base) */
+.code-object-container,
+.prompt-object-container,
+.action-object-container { 
+    background-color: var(--secondary-bg-color); 
+    border-left: 4px solid var(--accent-color); /* Default blue color */
+    padding: 20px 12px 12px 12px; /* Sufficient top padding */
+    margin: 10px 0; 
+    border-radius: 4px; 
+    position: relative; 
+    font-family: 'SFMono-Regular', Consolas, monospace; 
+    overflow: auto; 
+}
+.user-message .code-object-container,
+.user-message .prompt-object-container,
+.user-message .action-object-container { 
+    /* When in chat history, structured objects must use the tertiary color for visibility against the blue user bubble */
+    background-color: var(--tertiary-bg-color); 
+    border-left-color: var(--accent-color); 
+    color: var(--main-text-color); 
+}
+
+/* Code and Prompt objects use this standard pre/code structure */
+
+.remove-object-btn { position: absolute; top: 2px; right: 5px; background: none; border: none; color: var(--secondary-text-color); font-size: 16px; cursor: pointer; padding: 0; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 10; }
+
+/* FIX 1: Adjust label position to fit cleanly inside the existing top margin (Issue 3) */
+.object-label { 
+    position: absolute; 
+    top: 5px; /* Moved down 5px to prevent clipping while staying anchored to the top */
+    left: 10px; 
+    background-color: var(--accent-color); 
+    color: white; 
+    padding: 2px 8px; 
+    border-radius: 0 0 10px 10px; 
+    font-size: 10px; 
+    font-weight: bold; 
+    z-index: 5;
+}
+
+/* --- PROMPT AND ACTION SPECIFIC STYLING --- */
+
+/* Prompt Object (Uses default code-object styling, but with specific label) */
+.prompt-object-container {
+    border-left-color: var(--accent-color); 
+}
+.prompt-object-container .object-label {
+    background-color: var(--accent-color); 
+}
+
+/* Action Object (Uses code-object-container base, but overrides border color and label) */
+.action-object-container {
+    border-left: 4px solid var(--accent-color); 
+}
+
+/* Custom Color Border Overrides for Action Bubbles (Pulls from theme variables) */
+/* Enhanced specificity to work in both chat input AND history */
+.action-object-container.default-bubble,
+.user-message .action-object-container.default-bubble { 
+    border-left-color: var(--accent-color) !important; 
+}
+
+.action-object-container.hug-bubble,
+.user-message .action-object-container.hug-bubble { 
+    border-left-color: var(--hug-color) !important; 
+}
+
+.action-object-container.punch-bubble,
+.user-message .action-object-container.punch-bubble { 
+    border-left-color: var(--punch-color) !important; 
+}
+
+.action-object-container.slap-bubble,
+.user-message .action-object-container.slap-bubble { 
+    border-left-color: var(--punch-color) !important;  /* Slap uses same color as punch */
+}
+
+.action-object-container.high-five-bubble,
+.user-message .action-object-container.high-five-bubble { 
+    border-left-color: var(--high-five-color) !important; 
+}
+
+.action-object-container.wave-bubble,
+.user-message .action-object-container.wave-bubble { 
+    border-left-color: var(--accent-color) !important; 
+}
+
+.action-object-container.cheers-bubble,
+.user-message .action-object-container.cheers-bubble { 
+    border-left-color: var(--accent-color) !important; 
+} 
+
+
+/* Action Object Label (Use a neutral, secondary color for the label) */
+/* Enhanced specificity to work in both chat input AND history */
+.action-object-container .object-label,
+.user-message .action-object-container .object-label {
+    background-color: var(--tertiary-bg-color) !important; 
+    color: var(--secondary-text-color) !important;
+    top: 5px; /* Aligned with generic object-label fix */
+    left: 8px;
+    border-radius: 0 0 10px 10px;
+    display: block !important;
+}
+
+/* FIX 3 (Unified): Ensure PRE inside ALL object types has consistent background in the CHAT INPUT */
+.chat-input-div .code-object-container pre,
+.chat-input-div .prompt-object-container pre,
+.chat-input-div .action-object-container pre {
+    background-color: var(--code-block-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    padding: 12px;
+}
+
+/* FIX 4: Neutralize Syntax Highlighting inside chat input to prevent unnecessary coloring/bolding */
+.chat-input-div .code-object-container pre code span,
+.chat-input-div .code-object-container code span {
+    color: inherit !important;
+    font-weight: normal !important;
+    font-style: normal !important;
+    background: none !important;
+}
+
+
+/* FIX 5: Fix Action object display in chat history (sent payload) */
+.user-message .action-object-container {
+    /* Use tertiary BG (darker than user blue) for object background in history for contrast */
+    background-color: var(--tertiary-bg-color); 
+    color: var(--main-text-color); /* Ensure text is visible */
+}
+.user-message .action-object-container pre,
+.user-message .code-object-container pre,
+.user-message .prompt-object-container pre {
+    /* Set inner pre to match the outer background, removing the default code block styling */
+    background: none !important; 
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    font-family: inherit !important;
+}
+.user-message .action-object-container code,
+.user-message .prompt-object-container code, 
+.user-message .code-object-container code {  
+    /* Ensure the inner code block's text is visible */
+    background: none !important;
+    color: inherit !important;
+    padding: 0 !important;
+    font-family: inherit !important;
+    display: block; 
+}
+
+/* --- END ACTION OBJECT BUBBLE STYLING --- */
+
+
+.generated-selfie, 
+.message-content img:not(.ai-avatar), 
+.message-content video {
+    max-width: 500px; /* Enforce max width */
+    height: auto;      /* Preserve aspect ratio */
+    border-radius: 8px;
+    display: block;    /* Treat as a block element */
+    margin: 10px 0;
+    box-shadow: 0 4px 8px var(--shadow-color-rgba);
+}
+
+/* ==========================================================================
+   5. CHAT INPUT & FORMS
+   ========================================================================== */
+
+#chat-input-area { flex-shrink: 0; padding: 10px; border-top: 1px solid var(--border-color); }
+#file-buttons-container { display: flex; gap: 10px; margin-bottom: 8px; } /* This styles the container for the missing buttons */
+#chat-form { display: flex; gap: 10px; }
+.chat-input-div { flex-grow: 1; background-color: var(--tertiary-bg-color); border: 1px solid var(--border-color); border-radius: 5px; padding: 10px; color: var(--main-text-color); font-size: 14px; overflow-y: auto; min-height: 50px; max-height: 200px; }
+.chat-input-div:empty:before { content: attr(placeholder); color: var(--secondary-text-color); }
+
+/* Insertable objects in chat input (prompts, actions, text objects) */
+.chat-input-div .insertable-object {
+    display: inline-block;
+    background-color: var(--secondary-bg-color);
+    border: 1px solid var(--accent-color);
+    border-left: 4px solid var(--accent-color);
+    border-radius: 4px;
+    padding: 4px 8px 4px 12px;
+    margin: 2px;
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    font-size: 12px;
+    position: relative;
+    cursor: default;
+    vertical-align: middle;
+}
+
+.chat-input-div .insertable-object .object-label {
+    display: inline;
+    background-color: var(--accent-color);
+    color: white;
+    padding: 1px 4px;
+    border-radius: 2px;
+    font-size: 10px;
+    font-weight: bold;
+    margin-right: 6px;
+}
+
+.chat-input-div .insertable-object .object-content {
+    display: inline;
+    color: var(--main-text-color);
+}
+
+/* Different colors for different object types */
+.chat-input-div .insertable-object.prompt-object {
+    border-left-color: #4a9eff;
+}
+
+.chat-input-div .insertable-object.action-object {
+    border-left-color: #ff9800;
+}
+
+.chat-input-div .insertable-object.text-object {
+    border-left-color: #9c27b0;
+}
+
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; margin-bottom: 5px; font-size: 14px; color: var(--secondary-text-color); }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--tertiary-bg-color); color: var(--main-text-color); }
+.form-group-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+
+/* ==========================================================================
+   6. MODALS & OVERLAYS
+   ========================================================================== */
+.modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: var(--shadow-color-rgba); display: flex; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+.modal-content { background-color: var(--secondary-bg-color); margin: auto; padding: 25px; border: 1px solid var(--border-color); width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; box-shadow: 0 4px 15px var(--shadow-color-rgba); border-radius: 10px; }
+.modal-content h2, .modal-content h3 { text-align: center; margin-bottom: 20px; }
+.modal-content p { text-align: center; }
+.modal-buttons { margin-top: 20px; display: flex; justify-content: center; gap: 10px; }
+.modal-textarea { width: 100%; min-height: 200px; resize: vertical; }
+
+/* Fix Ingestion Overlay: Ensure it covers everything */
+#ingestion-overlay { 
+    position: fixed; 
+    z-index: 1001; /* Higher than other modals */
+    left: 0; 
+    top: 0; 
+    width: 100%; 
+    height: 100%; 
+    background-color: var(--shadow-color-rgba); 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    backdrop-filter: blur(2px); 
+}
+
+/* Fix Color Picker Modal: Ensure it appears above other UI elements */
+#color-picker-modal {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--shadow-color-rgba);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(2px);
+    z-index: 1002; /* Higher than ingestion overlay */
+    overflow-y: auto; /* Allow scrolling when content is too tall */
+}
+
+#color-picker-modal .modal-content {
+    margin: 20px auto; /* Add margin for scroll padding */
+    max-height: calc(100vh - 40px); /* Ensure it doesn't exceed viewport */
+    overflow-y: auto; /* Make content scrollable */
+}
+#ingestion-log-container {
+    background-color: var(--secondary-bg-color); 
+    padding: 25px; 
+    border: 1px solid var(--border-color); 
+    width: 90%; 
+    max-width: 500px;
+    max-height: 60vh; 
+    overflow-y: auto; 
+    box-shadow: 0 4px 15px var(--shadow-color-rgba); 
+    border-radius: 10px; 
+    display: flex;
+    flex-direction: column;
+}
+#ingestion-log {
+    flex-grow: 1;
+    background-color: var(--tertiary-bg-color);
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 15px;
+    max-height: 300px; /* Cap log height */
+    overflow-y: auto;
+    font-size: 12px;
+}
+#ingestion-log p {
+    margin: 2px 0;
+    line-height: 1.4;
+    color: var(--secondary-text-color);
+}
+#ingestion-close-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+}
+/* END Ingestion Overlay Fix */
+
+/* Wider Modals for Gen Tools */
+#image-gen-modal .modal-content, 
+#selfie-gen-modal .modal-content, 
+#video-gen-modal .modal-content,
+#advanced-video-gen-modal .modal-content { 
+    max-width: 900px !important; 
+    max-height: 90vh !important;
+}
+
+/* Larger prompt textareas for gen modals */
+#image-prompt,
+#advanced-video-prompt,
+#video-prompt-input {
+    min-height: 120px !important;
+    resize: vertical;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Negative prompt textareas */
+#image-negative-prompt,
+#advanced-video-negative-prompt {
+    min-height: 80px !important;
+    resize: vertical;
+}
+
+/* Ensure scrollability for all modal textareas */
+#image-prompt,
+#advanced-video-prompt,
+#video-prompt-input,
+#image-negative-prompt,
+#advanced-video-negative-prompt,
+#advanced-video-free-payload {
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-color) var(--tertiary-bg-color);
+}
+
+/* Webkit scrollbar styling for textareas */
+#image-prompt::-webkit-scrollbar,
+#advanced-video-prompt::-webkit-scrollbar,
+#video-prompt-input::-webkit-scrollbar,
+#image-negative-prompt::-webkit-scrollbar,
+#advanced-video-negative-prompt::-webkit-scrollbar,
+#advanced-video-free-payload::-webkit-scrollbar {
+    width: 8px;
+}
+
+#image-prompt::-webkit-scrollbar-track,
+#advanced-video-prompt::-webkit-scrollbar-track,
+#video-prompt-input::-webkit-scrollbar-track,
+#image-negative-prompt::-webkit-scrollbar-track,
+#advanced-video-negative-prompt::-webkit-scrollbar-track,
+#advanced-video-free-payload::-webkit-scrollbar-track {
+    background: var(--tertiary-bg-color);
+    border-radius: 4px;
+}
+
+#image-prompt::-webkit-scrollbar-thumb,
+#advanced-video-prompt::-webkit-scrollbar-thumb,
+#video-prompt-input::-webkit-scrollbar-thumb,
+#image-negative-prompt::-webkit-scrollbar-thumb,
+#advanced-video-negative-prompt::-webkit-scrollbar-thumb,
+#advanced-video-free-payload::-webkit-scrollbar-thumb {
+    background: var(--accent-color);
+    border-radius: 4px;
+}
+
+#image-prompt::-webkit-scrollbar-thumb:hover,
+#advanced-video-prompt::-webkit-scrollbar-thumb:hover,
+#video-prompt-input::-webkit-scrollbar-thumb:hover,
+#image-negative-prompt::-webkit-scrollbar-thumb:hover,
+#advanced-video-negative-prompt::-webkit-scrollbar-thumb:hover,
+#advanced-video-free-payload::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
+}
+
+/* Image Preview Sizing */
+.generated-image-preview {
+    max-width: 300px;
+    height: auto;
+    border-radius: 8px;
+    margin: 10px 0;
+    box-shadow: 0 2px 8px var(--shadow-color-rgba);
+    display: block;
+}
+
+#image-previews-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+/* Specific Modal Lists */
+.prompt-item, .personality-item, .action-item, .list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border: 1px solid var(--border-color); border-radius: 5px; margin-bottom: 10px; }
+#memories-list, #knowledge-files-list { max-height: 400px; overflow-y: auto; }
+
+/* FIX: I2V visibility */
+div[id^="video-"][class]:not(.hidden) { display: block !important; }
+
+/* ==========================================================================
+   7. ACCOUNT PAGE & TABS (account.html)
+   ========================================================================== */
+body.account-page { display: flex; justify-content: center; align-items: flex-start; padding-top: 2rem; overflow-y: auto; }
+.account-page .container { max-width: 800px; margin: 0 auto; }
+.account-section { margin-bottom: 20px; padding: 20px; background: var(--secondary-bg-color); border-radius: 8px; border-left: 4px solid var(--accent-color); text-align: left; }
+.launch-actions { text-align: center; }
+
+.tab-navigation { display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 20px; }
+.tab-btn { padding: 12px 20px; cursor: pointer; background-color: transparent; border: none; color: var(--secondary-text-color); border-bottom: 3px solid transparent; font-size: 16px; transition: all 0.2s ease-in-out; }
+.tab-btn:hover { background-color: var(--tertiary-bg-color); }
+.tab-btn.active { color: var(--accent-color); border-bottom-color: var(--accent-color); font-weight: bold; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+.api-list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid var(--border-color); }
+#installed-ollama-models-list, #custom-apis-list { margin-top: 15px; max-height: 180px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 4px; padding: 10px; background-color: var(--tertiary-bg-color); }
+
+/* ==========================================================================
+   8. MISC & COMPONENT STYLES
+   ========================================================================== */
+#status-bar { padding: 10px; text-align: center; font-weight: bold; }
+#status-bar.success { background-color: var(--success-color); }
+#status-bar.error { background-color: var(--error-color); }
+
+.slider-group { margin-bottom: 15px; }
+.slider-group label { font-weight: bold; }
+.slider-group small { font-size: 11px; color: var(--secondary-text-color); display: block; margin-bottom: 5px; }
+.slider-group input[type="range"] { width: 100%; margin-top: 5px; }
+
+/* ==========================================================================
+   9. SWITCH TOGGLE STYLES
+   ========================================================================== */
+
+/* Toggle control container */
+.toggle-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.toggle-control:last-child {
+  border-bottom: none;
+}
+
+/* Toggle label and text */
+.toggle-label {
+  flex: 1;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.toggle-text {
+  font-weight: 500;
+  color: var(--main-text-color);
+  font-size: 14px;
+}
+
+.toggle-description {
+  font-size: 12px;
+  color: var(--secondary-text-color);
+  font-style: italic;
+}
+
+.toggle-warning {
+  font-size: 11px;
+  color: var(--error-color);
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+/* The switch - the box around the slider */
+.switch-label {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+  margin-left: 16px;
+  cursor: pointer;
+}
+
+/* Hide default HTML checkbox */
+.switch-label input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--button-bg-color);
+  transition: .3s ease;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .3s ease;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.switch-label input:checked + .slider {
+  background-color: var(--accent-color);
+  box-shadow: 0 0 8px rgba(14, 99, 156, 0.3);
+}
+
+.switch-label input:focus + .slider {
+  box-shadow: 0 0 1px var(--accent-color);
+}
+
+.switch-label input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 24px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+/* ==========================================================================
+   10. LOADING & FEEDBACK STYLES
+   ========================================================================== */
+
+/* Loading spinner */
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border-color);
+  border-radius: 50%;
+  border-top-color: var(--accent-color);
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Processing indicator */
+.processing-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background-color: var(--tertiary-bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin: 16px 0;
+}
+
+.processing-indicator .spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--border-color);
+  border-radius: 50%;
+  border-top-color: var(--accent-color);
+  animation: spin 1s linear infinite;
+  margin-right: 12px;
+}
+
+.processing-indicator .message {
+  color: var(--main-text-color);
+  font-weight: 500;
+}
+
+/* Enhanced log output */
+.log-output {
+  background-color: var(--tertiary-bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 12px;
+  margin: 16px 0;
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.4;
+  max-height: 200px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.log-output:empty {
+  display: none;
+}
+
+/* Status messages */
+.status-success {
+  color: var(--success-color);
+  font-weight: 500;
+}
+
+.status-error {
+  color: var(--error-color);
+  font-weight: 500;
+}
+
+.status-info {
+  color: var(--accent-color);
+  font-weight: 500;
+}
+
+/* Button states */
+.btn-primary:disabled,
+.btn-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: var(--button-bg-color);
+  color: var(--secondary-text-color);
+}
+
+.btn-primary.processing {
+  background-color: var(--accent-color);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary.processing::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+#attached-file-display {
+  padding: 8px 12px;
+  margin: 5px 0;
+  background-color: var(--tertiary-bg-color);
+  border-left: 3px solid var(--accent-color);
+  border-radius: 4px;
+  font-size: 14px;
+  color: var(--main-text-color);
+}
+
+#attached-file-display.hidden {
+  display: none;
+}
+
+.attachment-indicator {
+  margin-top: 8px;
+  padding: 6px 10px;
+  background-color: var(--tertiary-bg-color);
+  border-left: 3px solid var(--accent-color);
+  border-radius: 4px;
+  font-size: 13px;
+  color: var(--secondary-text-color);
+  font-style: italic;
+}

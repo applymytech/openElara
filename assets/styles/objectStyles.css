@@ -1,0 +1,124 @@
+/* assets/styles/objectStyles.css */
+
+/* Base container for all inserted objects - UNIFORM STYLE */
+.inserted-object-container {
+    display: block;
+    position: relative;
+    background-color: var(--secondary-bg-color);
+    color: var(--main-text-color);
+    border-radius: 6px;
+    padding: 24px 8px 8px 8px; /* Top padding for label */
+    margin: 6px 0;
+    border: 1px solid var(--border-color);
+    white-space: normal;
+    word-break: break-word;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+/* Make the container non-editable by default */
+.inserted-object-container[contenteditable="false"] {
+    cursor: default;
+}
+
+/* Style for the preformatted text inside the object */
+.inserted-object-container pre {
+    margin: 0;
+    padding: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: inherit;
+    font-size: inherit;
+    background-color: transparent;
+    border: none;
+}
+
+.inserted-object-container code {
+    background-color: transparent;
+    padding: 0;
+    border: none;
+    font-family: inherit;
+}
+
+/* Base label style - UNIFORM */
+.object-label {
+    position: absolute;
+    top: 4px;
+    left: 8px;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 3px;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background-color: var(--accent-color);
+}
+
+/* Remove button style - UNIFORM */
+.remove-object-btn {
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    width: 16px;
+    height: 16px;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 16px;
+    text-align: center;
+    opacity: 0.6;
+    transition: opacity 0.2s, background-color 0.2s;
+    font-weight: bold;
+}
+
+.inserted-object-container:hover .remove-object-btn {
+    opacity: 1;
+}
+
+.remove-object-btn:hover {
+    background: var(--error-color);
+    opacity: 1;
+}
+
+/* Color coding by type - use theme variables */
+.prompt-object-container .object-label {
+    background-color: var(--accent-color);
+}
+
+.code-object-container .object-label {
+    background-color: var(--accent-color);
+}
+
+.action-object-container .object-label {
+    background-color: var(--accent-color);
+}
+
+/* Specific Action Bubble Styles - use theme variables */
+.action-object-container.system-bubble .object-label {
+    background-color: var(--secondary-text-color);
+}
+
+.action-object-container.success-bubble .object-label {
+    background-color: var(--success-color);
+}
+
+.action-object-container.error-bubble .object-label {
+    background-color: var(--error-color);
+}
+
+.action-object-container.info-bubble .object-label {
+    background-color: var(--accent-color);
+}
+
+/* Remove old inconsistent styles */
+.chat-input-div .inserted-object-container,
+.message-content .inserted-object-container {
+    /* All objects look the same everywhere */
+    background-color: var(--secondary-bg-color);
+    color: var(--main-text-color);
+}

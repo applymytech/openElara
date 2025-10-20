@@ -1,0 +1,10 @@
+# Image Processor Dependencies
+
+# Core image processing
+Pillow>=10.0.0
+
+# UI
+tkinterdnd2>=0.3.0
+
+# Build (optional - only needed for creating .exe)
+# pyinstaller>=6.0.0

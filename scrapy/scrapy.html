@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Scrape - OpenElara</title>
+    <link rel="stylesheet" href="../assets/styles/style.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #2d1b3d 0%, #4a2c5e 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            color: #e0e0e0;
+            overflow-y: auto;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        
+        .main-content {
+            min-height: calc(100vh - 40px);
+            padding-bottom: 50px; /* Buffer space at the bottom */
+        }
+
+        .scrapy-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(30, 30, 30, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        h1 {
+            text-align: center;
+            color: #a78bfa;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #a0a0a0;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        .tool-badge {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .scrape-section {
+            background: #252525;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            color: #a78bfa;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-icon {
+            font-size: 1.3em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #b0b0b0;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .url-input-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .url-counter {
+            background: #1a1a1a;
+            color: #a78bfa;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .url-counter.warning {
+            color: #fbbf24;
+        }
+
+        .url-counter.max {
+            color: #ef4444;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 0.95em;
+            font-family: 'Consolas', 'Courier New', monospace;
+            box-sizing: border-box;
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #a78bfa;
+            box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.2);
+        }
+
+        textarea::placeholder {
+            color: #666;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: #b0b0b0;
+            transition: color 0.2s;
+        }
+
+        .radio-label:hover {
+            color: #fff;
+        }
+
+        .radio-label input[type="radio"] {
+            cursor: pointer;
+            accent-color: #a78bfa;
+        }
+
+        .radio-label input[type="radio"]:checked + .radio-text {
+            color: #a78bfa;
+            font-weight: 600;
+        }
+
+        .mode-description {
+            background: #1a1a1a;
+            border-left: 3px solid #a78bfa;
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 0.85em;
+            color: #a0a0a0;
+        }
+
+        .mode-description strong {
+            color: #a78bfa;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: #a78bfa;
+            color: #1a1a1a;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #8b5cf6;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(167, 139, 250, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #555;
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: #666;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
+        /* Progress Section */
+        .progress-section {
+            display: none;
+            background: #252525;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .progress-section.active {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .progress-title {
+            color: #a78bfa;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .progress-stats {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85em;
+        }
+
+        .stat-item {
+            background: #1a1a1a;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+
+        .stat-label {
+            color: #888;
+            margin-right: 5px;
+        }
+
+        .stat-value {
+            color: #a78bfa;
+            font-weight: 600;
+        }
+
+        .progress-bar-container {
+            background: #1a1a1a;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #a78bfa 0%, #8b5cf6 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .log-container {
+            background: #1a1a1a;
+            border-radius: 6px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.85em;
+        }
+
+        .log-entry {
+            padding: 6px 0;
+            border-bottom: 1px solid #2a2a2a;
+            color: #b0b0b0;
+            line-height: 1.5;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-entry.success {
+            color: #10b981;
+        }
+
+        .log-entry.error {
+            color: #ef4444;
+        }
+
+        .log-entry.info {
+            color: #60a5fa;
+        }
+
+        .log-timestamp {
+            color: #666;
+            margin-right: 8px;
+        }
+
+        /* Results Section */
+        .results-section {
+            display: none;
+            background: #252525;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .results-section.active {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .results-header {
+            color: #10b981;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .results-summary {
+            background: #1a1a1a;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .summary-item {
+            text-align: center;
+        }
+
+        .summary-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: #a78bfa;
+            display: block;
+        }
+
+        .summary-label {
+            color: #888;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+
+        .file-list {
+            background: #1a1a1a;
+            border-radius: 6px;
+            padding: 15px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: #252525;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .file-item:hover {
+            background: #2a2a2a;
+        }
+
+        .file-icon {
+            font-size: 1.2em;
+        }
+
+        .file-name {
+            flex: 1;
+            color: #e0e0e0;
+            font-size: 0.9em;
+        }
+
+        .file-size {
+            color: #888;
+            font-size: 0.8em;
+        }
+
+        .open-folder-btn {
+            background: #10b981;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+
+        .open-folder-btn:hover {
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Scrollbar Styling */
+        .log-container::-webkit-scrollbar,
+        .file-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .log-container::-webkit-scrollbar-track,
+        .file-list::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 4px;
+        }
+
+        .log-container::-webkit-scrollbar-thumb,
+        .file-list::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
+        }
+
+        .log-container::-webkit-scrollbar-thumb:hover,
+        .file-list::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .info-box {
+            background: rgba(167, 139, 250, 0.1);
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-box strong {
+            color: #a78bfa;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: #a78bfa;
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #8b5cf6;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-content">
+        <div class="scrapy-container">
+            <a href="index.html" class="back-link">← Back to Main App</a>
+        
+        <div style="text-align: center;">
+            <span class="tool-badge">FREE TOOL</span>
+        </div>
+        <h1>⚡ Power Scrape</h1>
+        <p class="subtitle">Extract content from websites with intelligent formatting</p>
+
+        <div class="scrape-section">
+            <div class="section-title">
+                <span class="section-icon">🌐</span>
+                <span>URL Configuration</span>
+            </div>
+
+            <div class="info-box">
+                <strong>Batch Processing:</strong> Enter multiple URLs (one per line) to scrape up to 64 sites. 
+                Content is saved to your configured output folder with proper Markdown formatting for easy ingestion into your knowledge base.
+            </div>
+
+            <div class="form-group">
+                <div class="url-input-header">
+                    <label for="scrapy-url-input">Target URLs</label>
+                    <span id="url-counter" class="url-counter">0 / 64</span>
+                </div>
+                <textarea 
+                    id="scrapy-url-input" 
+                    placeholder="https://example.com/page1&#10;https://example.com/page2&#10;https://example.com/article"
+                    rows="6"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Scrape Mode</label>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="scrapeMode" value="content" id="mode-content" checked>
+                        <span class="radio-text">📄 Content</span>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="scrapeMode" value="links" id="mode-links">
+                        <span class="radio-text">🔗 Links</span>
+                    </label>
+                </div>
+                <div id="mode-description" class="mode-description">
+                    <strong>Content Mode:</strong> Extracts the main text content from each page with intelligent formatting. 
+                    Preserves headings, lists, and structure in clean Markdown format.
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button id="start-scrape-btn" class="btn btn-primary">
+                    🚀 Start Scraping
+                </button>
+                <button id="clear-btn" class="btn btn-secondary">
+                    🗑️ Clear
+                </button>
+            </div>
+        </div>
+
+        <!-- Progress Section -->
+        <div id="progress-section" class="progress-section">
+            <div class="progress-header">
+                <div class="progress-title">⏳ Scraping in Progress...</div>
+                <div class="progress-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Completed:</span>
+                        <span id="completed-count" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Total:</span>
+                        <span id="total-count" class="stat-value">0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="progress-bar-container">
+                <div id="progress-bar" class="progress-bar"></div>
+            </div>
+            <div class="log-container" id="log-container">
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="results-section">
+            <div class="results-header">
+                <span>✅</span>
+                <span>Scraping Complete!</span>
+            </div>
+            
+            <div class="results-summary">
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <span id="success-count" class="summary-value">0</span>
+                        <div class="summary-label">Successful</div>
+                    </div>
+                    <div class="summary-item">
+                        <span id="failed-count" class="summary-value">0</span>
+                        <div class="summary-label">Failed</div>
+                    </div>
+                    <div class="summary-item">
+                        <span id="total-size" class="summary-value">0 KB</span>
+                        <div class="summary-label">Total Size</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="file-list" id="file-list">
+            </div>
+
+            <button id="open-folder-btn" class="open-folder-btn">
+                📂 Open Output Folder
+            </button>
+        </div>
+    </div>
+
+    <script src="scrapy.js"></script>
+</div> <!-- main-content -->
+    </body>
+
+</html>

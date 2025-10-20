@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Content Viewer</title>
+    <link rel="stylesheet" href="../assets/styles/style.css" />
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+        
+        #viewer-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .rag-list-container {
+            flex: 3;
+            overflow-y: auto;
+            overflow-x: hidden;
+            min-height: 0;
+            margin: 10px 0;
+        }
+        
+        .rag-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .rag-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+        .rag-list-item:hover {
+            background-color: var(--tertiary-bg-color);
+        }
+        .rag-list-item-content {
+            flex-grow: 1;
+            padding-right: 15px;
+        }
+        .rag-item-meta {
+            font-size: 0.8em;
+            color: var(--secondary-text-color);
+            margin-top: 5px;
+        }
+        .item-actions button {
+            margin-left: 5px;
+            padding: 5px 10px;
+        }
+        #content-display {
+            display: none; 
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            padding: 20px 0;
+            font-size: 0.9em;
+            flex: 1;
+            overflow-y: auto;
+        }
+        .single-content {
+            display: block !important;
+        }
+        
+        #controls {
+            margin-top: 10px;
+            flex-shrink: 0;
+        }
+        
+        .pagination-controls {
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body class="theme-active">
+    <div id="viewer-container">
+        <h3 id="viewer-title">Viewer</h3>
+        <p id="viewer-status"></p>
+        
+        <div id="pagination-controls-top" class="pagination-controls hidden" style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <label>Items per page:</label>
+            <select id="page-size-selector" class="input-field" style="width: auto; padding: 5px;">
+                <option value="10">10</option>
+                <option value="25" selected>25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="0">All</option>
+            </select>
+            
+            <div id="view-mode-controls" class="hidden" style="display: flex; align-items: center; gap: 5px; margin-left: 20px;">
+                <label>View:</label>
+                <select id="view-mode-selector" class="input-field" style="width: auto; padding: 5px;">
+                    <option value="chunks">Individual Chunks</option>
+                    <option value="grouped">Grouped by File</option>
+                </select>
+            </div>
+            
+            <span id="page-info" style="margin-left: 10px; font-size: 0.9em; color: var(--secondary-text-color);"></span>
+            
+            <div style="margin-left: auto; display: flex; gap: 5px;">
+                <button id="prev-page-btn" class="btn-secondary" style="padding: 5px 15px;">← Previous</button>
+                <button id="next-page-btn" class="btn-secondary" style="padding: 5px 15px;">Next →</button>
+            </div>
+        </div>
+        
+        <div id="rag-list-container" class="rag-list-container">
+        </div>
+
+        <pre id="content-display" class="single-content"></pre>
+
+        <div id="controls" style="margin-top: 20px;">
+            <button id="close-viewer-btn" class="btn-secondary">Close</button>
+            <button id="back-to-list-btn" class="btn-secondary hidden">Back to List</button>
+        </div>
+    </div>
+    <script src="viewer.js"></script>
+</body>
+</html>

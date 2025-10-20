@@ -1,0 +1,58 @@
+{
+  "characterName": "Elara",
+  "version": "1.0.0",
+  "spriteSize": {
+    "width": 128,
+    "height": 128
+  },
+  "animations": {
+    "idle": {
+      "directions": {
+        "s": {
+          "frames": ["sprites/idle/s/frame_0.png"],
+          "fps": 1
+        },
+        "e": {
+          "frames": ["sprites/idle/e/frame_0.png"],
+          "fps": 1
+        },
+        "w": {
+          "frames": ["sprites/idle/w/frame_0.png"],
+          "fps": 1
+        }
+      }
+    },
+    "walk": {
+      "directions": {
+        "s": {
+          "frames": ["sprites/walk/s/frame_0.png", "sprites/walk/s/frame_1.png"],
+          "fps": 4
+        },
+        "e": {
+          "frames": ["sprites/walk/e/frame_0.png", "sprites/walk/e/frame_1.png"],
+          "fps": 4
+        },
+        "w": {
+          "frames": ["sprites/walk/w/frame_0.png", "sprites/walk/w/frame_1.png"],
+          "fps": 4
+        }
+      }
+    },
+    "fall": {
+      "directions": {
+        "down": {
+          "frames": ["sprites/fall/down/frame_0.png"],
+          "fps": 1
+        }
+      }
+    },
+    "climb": {
+      "directions": {
+        "up": {
+          "frames": ["sprites/climb/up/frame_0.png"],
+          "fps": 1
+        }
+      }
+    }
+  }
+}

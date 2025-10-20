@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - openElara</title>
+    <link rel="stylesheet" href="assets/styles/style.css">
+    <style>
+        body {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            line-height: 1.8;
+            overflow-y: auto;
+        }
+        h1 {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: var(--accent-color);
+            margin-top: 40px;
+            margin-bottom: 15px;
+        }
+        h3 {
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+        ul {
+            margin-left: 20px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .emphasis {
+            background: var(--secondary-bg-color);
+            padding: 15px;
+            border-left: 4px solid var(--accent-color);
+            margin: 20px 0;
+        }
+        .contact {
+            background: var(--tertiary-bg-color);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 40px;
+        }
+        .last-updated {
+            color: var(--secondary-text-color);
+            font-size: 0.9em;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body class="theme-active">
+    <h1>Privacy Policy</h1>
+    <p class="last-updated"><strong>Last Updated:</strong> October 12, 2025</p>
+    
+    <div class="emphasis">
+        <p><strong>IMPORTANT NOTICE:</strong> This is a placeholder privacy policy template intended for development and testing purposes. While it reflects the actual privacy practices of openElara, it should be reviewed by legal counsel before any commercial deployment or public distribution.</p>
+    </div>
+
+    <h2>1. Overview</h2>
+    <p><strong>openElara</strong> is an open-source, local-first AI companion application. This privacy policy explains how the application handles your data. The fundamental principle is simple: <strong>Your data stays on your device.</strong></p>
+
+    <h2>2. Data Collection and Storage</h2>
+    
+    <h3>2.1 Local-Only Architecture</h3>
+    <p>openElara is designed with a <strong>local-first philosophy</strong>:</p>
+    <ul>
+        <li><strong>No Cloud Storage:</strong> All your data (conversations, files, settings, API keys) is stored exclusively on your local device.</li>
+        <li><strong>No Telemetry:</strong> The application does not collect, transmit, or analyze usage data, analytics, crash reports, or any other telemetry.</li>
+        <li><strong>No Account Required:</strong> openElara does not require user accounts, authentication, or any form of user identification.</li>
+        <li><strong>No Server Communication:</strong> The application does not communicate with any openElara servers because <em>there are no openElara servers</em>.</li>
+    </ul>
+
+    <h3>2.2 Data Stored Locally</h3>
+    <p>The following data is stored on your device in <code>%AppData%\Roaming\openelara\</code> (Windows) or equivalent OS-specific locations:</p>
+    <ul>
+        <li><strong>Conversation History:</strong> Chat conversations with AI characters (stored in local ChromaDB vector database)</li>
+        <li><strong>Knowledge Base:</strong> Files you ingest for retrieval-augmented generation (stored in local ChromaDB database)</li>
+        <li><strong>Settings:</strong> Application preferences, theme choices, selected models, character selection</li>
+        <li><strong>API Keys:</strong> Third-party API keys (encrypted using operating system's secure storage)</li>
+        <li><strong>Generated Content:</strong> Images, videos, and research outputs you create</li>
+        <li><strong>Custom Personalities/Prompts:</strong> Any custom AI personalities or prompt templates you create</li>
+    </ul>
+
+    <h2>3. Third-Party Services</h2>
+
+    <h3>3.1 External API Usage</h3>
+    <p>openElara connects to third-party AI services <strong>only when you explicitly configure and use them</strong>:</p>
+    <ul>
+        <li><strong>Ollama (Local):</strong> Runs entirely on your machine with no external communication</li>
+        <li><strong>TogetherAI:</strong> Cloud-based LLM provider (if you configure their API key)</li>
+        <li><strong>OpenAI-Compatible APIs:</strong> Any compatible service you manually configure</li>
+        <li><strong>Exa.ai:</strong> Web research service (if you configure their API key)</li>
+        <li><strong>AI/ML API:</strong> Video generation service (if you configure their API key)</li>
+    </ul>
+    
+    <div class="emphasis">
+        <p><strong>Important:</strong> When you use these third-party services, your prompts, queries, and generated content are sent to those providers according to <em>their</em> privacy policies. openElara does not control or have visibility into how those services handle your data. Review each provider's privacy policy before using their services.</p>
+    </div>
+
+    <h3>3.2 API Key Security</h3>
+    <p>API keys for third-party services are:</p>
+    <ul>
+        <li>Encrypted using your operating system's secure storage mechanism (Electron safeStorage)</li>
+        <li>Stored only on your local device</li>
+        <li>Never transmitted to openElara (we have no servers to receive them)</li>
+        <li>Only decrypted in memory when making API calls</li>
+    </ul>
+
+    <h2>4. Data Sharing</h2>
+    
+    <h3>4.1 No Data Sharing by openElara</h3>
+    <p>openElara does <strong>not</strong>:</p>
+    <ul>
+        <li>Share your data with any third parties</li>
+        <li>Sell your data</li>
+        <li>Analyze your usage patterns</li>
+        <li>Collect aggregate or anonymous statistics</li>
+        <li>Use your data for training or research</li>
+    </ul>
+
+    <h3>4.2 User-Initiated Sharing</h3>
+    <p>You control all data sharing:</p>
+    <ul>
+        <li>If you use third-party AI APIs, you are sharing data with <em>those providers</em> under their terms</li>
+        <li>If you use web research features (Exa, Scrapy), you are requesting data from <em>those services</em></li>
+        <li>If you export or save content, you control where it goes</li>
+    </ul>
+
+    <h2>5. Data Retention and Deletion</h2>
+    
+    <h3>5.1 Your Control</h3>
+    <p>You have complete control over data retention:</p>
+    <ul>
+        <li><strong>Conversation History:</strong> Delete individual turns or clear all history via "View & Manage Memories"</li>
+        <li><strong>Knowledge Base:</strong> Remove individual files or clear entire knowledge base via "View & Manage KB"</li>
+        <li><strong>Generated Content:</strong> Delete files from Output folders at any time</li>
+        <li><strong>Settings:</strong> Reset to defaults or manually edit configuration files</li>
+        <li><strong>Complete Removal:</strong> Uninstall the app and delete <code>%AppData%\Roaming\openelara\</code> to remove all data</li>
+    </ul>
+
+    <h3>5.2 Automatic Deletion</h3>
+    <p>openElara does <strong>not</strong> automatically delete any of your data. Data persists until you explicitly remove it.</p>
+
+    <h2>6. Security</h2>
+    
+    <h3>6.1 Local Security Measures</h3>
+    <ul>
+        <li><strong>Encrypted API Keys:</strong> Third-party API keys are encrypted using OS-level secure storage</li>
+        <li><strong>Content Security Policy:</strong> Strict CSP prevents unauthorized script execution</li>
+        <li><strong>Context Isolation:</strong> Renderer processes cannot directly access Node.js APIs</li>
+        <li><strong>No Remote Code Execution:</strong> Application does not download or execute remote code</li>
+    </ul>
+
+    <h3>6.2 Your Responsibility</h3>
+    <p>Because openElara is a local application, security depends on:</p>
+    <ul>
+        <li>Securing your device with passwords, encryption, etc.</li>
+        <li>Keeping your operating system and openElara updated</li>
+        <li>Safeguarding your third-party API keys</li>
+        <li>Backing up your data if needed (openElara does not provide backup services)</li>
+    </ul>
+
+    <h2>7. Open Source Transparency</h2>
+    <p>openElara is <strong>fully open source</strong>. You can:</p>
+    <ul>
+        <li>Review all source code to verify privacy claims</li>
+        <li>Audit network requests to confirm no unauthorized data transmission</li>
+        <li>Build from source to ensure no modifications</li>
+        <li>Fork and modify for your own use under the license terms</li>
+    </ul>
+    <p><strong>Repository:</strong> <em>[GitHub URL will be added upon public release]</em></p>
+
+    <h2>8. Children's Privacy</h2>
+    <p>openElara is not directed at children under 13. The application does not knowingly collect data from children. Because the app is local-only and requires manual configuration of API keys, parental supervision is recommended for use by minors.</p>
+
+    <h2>9. International Users</h2>
+    <p>Because openElara is a local-only application with no servers, there is no cross-border data transfer by the application itself. However, if you use third-party APIs based in other countries, review their data handling practices.</p>
+
+    <h2>10. Changes to This Policy</h2>
+    <p>Updates to this privacy policy will be:</p>
+    <ul>
+        <li>Included in new versions of the application</li>
+        <li>Documented in the app's changelog</li>
+        <li>Posted in the GitHub repository</li>
+    </ul>
+    <p>Continued use of openElara after updates constitutes acceptance of the revised policy.</p>
+
+    <h2>11. Your Rights</h2>
+    <p>Because all data is stored locally on your device, you have complete rights to:</p>
+    <ul>
+        <li><strong>Access:</strong> All data is in accessible formats (JSON, markdown, SQLite/ChromaDB)</li>
+        <li><strong>Modify:</strong> Edit configuration files or database contents directly</li>
+        <li><strong>Delete:</strong> Remove any or all data at any time</li>
+        <li><strong>Export:</strong> Copy data folders to other locations or devices</li>
+        <li><strong>Port:</strong> Migrate data to other applications that support the formats</li>
+    </ul>
+
+    <h2>12. Contact</h2>
+    <div class="contact">
+        <p>If you have questions about this privacy policy or openElara's data practices:</p>
+        <ul>
+            <li><strong>General Inquiries:</strong> <a href="mailto:openelara@applymytech.com">openelara@applymytech.com</a></li>
+            <li><strong>Support:</strong> <a href="mailto:support@applymytech.com">support@applymytech.com</a></li>
+            <li><strong>GitHub Issues:</strong> <em>[Will be added upon public release]</em></li>
+        </ul>
+        <p><strong>Note:</strong> Because openElara has no servers and collects no data centrally, there is no "data controller" to contact about GDPR requests. You control all data on your own device.</p>
+    </div>
+
+    <h2>13. Legal Disclaimer</h2>
+    <div class="emphasis">
+        <p><strong>PLACEHOLDER NOTICE:</strong> This privacy policy template is provided for development purposes. It reflects the intended privacy practices of openElara but has not been reviewed by legal counsel. Before any commercial use, public distribution, or deployment, this document must be reviewed and approved by qualified legal professionals familiar with privacy laws in your jurisdiction(s).</p>
+    </div>
+
+    <hr style="margin: 40px 0; border: none; border-top: 1px solid var(--border-color);">
+    
+    <p style="text-align: center; color: var(--secondary-text-color); font-size: 0.9em;">
+        © 2025 openElara | Open Source AI Companion<br>
+        <em>Your Data, Your Device, Your Control</em>
+    </p>
+</body>
+</html>

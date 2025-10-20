@@ -1,0 +1,298 @@
+/* Quick Insert Palette Styles */
+
+.quick-insert-palette {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 10vh;
+}
+
+.quick-insert-palette.hidden {
+    display: none;
+}
+
+.quick-insert-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+}
+
+.quick-insert-container {
+    position: relative;
+    width: 600px;
+    max-width: 90vw;
+    max-height: 70vh;
+    background: var(--secondary-bg-color);
+    border-radius: 12px;
+    box-shadow: 0 20px 60px var(--shadow-color-rgba), 0 0 0 1px var(--border-color);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: quickInsertSlideIn 0.2s ease-out;
+}
+
+@keyframes quickInsertSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.quick-insert-header {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.quick-insert-search {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--tertiary-bg-color);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    color: var(--main-text-color);
+    font-size: 16px;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.quick-insert-search:focus {
+    border-color: var(--accent-color);
+    background: var(--main-bg-color);
+}
+
+.quick-insert-search::placeholder {
+    color: var(--secondary-text-color);
+}
+
+.quick-insert-tabs {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.quick-insert-tab {
+    flex: 1;
+    padding: 8px 12px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--secondary-text-color);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.quick-insert-tab:hover {
+    background: var(--tertiary-bg-color);
+    color: var(--main-text-color);
+}
+
+.quick-insert-tab.active {
+    background: var(--accent-color);
+    color: var(--accent-contrast-text-color);
+    border-color: var(--accent-color);
+    font-weight: 600;
+}
+
+.quick-insert-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.quick-insert-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+}
+
+.quick-insert-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 2px solid transparent;
+}
+
+.quick-insert-item:hover {
+    background: var(--tertiary-bg-color);
+}
+
+.quick-insert-item.selected {
+    background: var(--tertiary-bg-color);
+    border-color: var(--accent-color);
+}
+
+.quick-insert-item-icon {
+    font-size: 24px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.quick-insert-item-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.quick-insert-item-name {
+    font-weight: 600;
+    color: var(--main-text-color);
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.quick-insert-item-description {
+    font-size: 13px;
+    color: var(--secondary-text-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.quick-insert-item-type {
+    font-size: 11px;
+    color: var(--secondary-text-color);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 4px 8px;
+    background: var(--main-bg-color);
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.quick-insert-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.quick-insert-empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.quick-insert-empty-text {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--main-text-color);
+    margin-bottom: 8px;
+}
+
+.quick-insert-empty-hint {
+    font-size: 14px;
+    color: var(--secondary-text-color);
+}
+
+.quick-insert-footer {
+    padding: 12px 16px;
+    border-top: 1px solid var(--border-color);
+    background: var(--main-bg-color);
+}
+
+.quick-insert-hint {
+    font-size: 12px;
+    color: var(--secondary-text-color);
+    text-align: center;
+}
+
+/* Scrollbar styling for items list */
+.quick-insert-items::-webkit-scrollbar {
+    width: 8px;
+}
+
+.quick-insert-items::-webkit-scrollbar-track {
+    background: var(--main-bg-color);
+}
+
+.quick-insert-items::-webkit-scrollbar-thumb {
+    background: var(--accent-color);
+    border-radius: 4px;
+}
+
+.quick-insert-items::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-color-hover);
+}
+
+
+/* ===========================
+   FLOATING ACTION BUTTON (FAB)
+   =========================== */
+.quick-insert-fab {
+    position: fixed;
+    bottom: 20px;
+    right: 24px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
+                0 2px 6px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    z-index: 999;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    pointer-events: auto;
+}
+
+.quick-insert-fab:hover {
+    background: var(--accent-color-hover);
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4),
+                0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+.quick-insert-fab:active {
+    transform: scale(0.95);
+}
+
+.quick-insert-fab .fab-icon {
+    font-size: 28px;
+    line-height: 1;
+    color: var(--accent-contrast-text-color);
+    user-select: none;
+}
+
+@keyframes fab-pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    }
+}
+
