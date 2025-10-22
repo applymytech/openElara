@@ -7,6 +7,14 @@
     <title>DeepAI Studio - OpenElara</title>
     <link rel="stylesheet" href="../assets/styles/style.css">
     <style>
+        :root {
+            --border-color: #444;
+            --tertiary-bg-color: #3a3a3a;
+            --text-muted-color: #a0a0a0;
+            --success-color: #4ade80;
+            --error-color: #f87171;
+        }
+
         body {
             background: linear-gradient(135deg, #1a1d3a 0%, #2d1b3d 100%);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -16,12 +24,13 @@
         }
 
         .deepai-container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
             background: rgba(30, 30, 30, 0.95);
             border-radius: 15px;
             padding: 30px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            overflow-x: hidden;
         }
 
         h1 {
@@ -51,9 +60,27 @@
 
         .tab-navigation {
             display: flex;
-            gap: 10px;
+            flex-wrap: wrap;
+            gap: 5px;
             margin-bottom: 25px;
             border-bottom: 2px solid #333;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 15px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: #888;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .tab-btn {
@@ -134,6 +161,43 @@
             font-size: 0.95em;
             font-weight: 600;
             transition: all 0.3s;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #2d2d2d;
+            border-radius: 10px;
+            padding: 25px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #444;
+        }
+
+        .prompt-item {
+            cursor: pointer;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            margin-bottom: 10px;
+            transition: background-color 0.2s;
+        }
+
+        .prompt-item:hover {
+            background-color: var(--tertiary-bg-color);
         }
 
         .btn-primary {
@@ -238,6 +302,27 @@
             margin-top: 20px;
         }
 
+        .tab-content {
+            box-sizing: border-box;
+        }
+
+        .tab-content {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        #inpainting-content {
+            max-width: 100%;
+        }
+
+        .form-group {
+            box-sizing: border-box;
+        }
+
+        input, textarea, select {
+            box-sizing: border-box;
+        }
+
         .tool-card {
             background: rgba(40, 40, 40, 0.8);
             border-radius: 8px;
@@ -289,13 +374,13 @@
 
         <div class="tab-navigation">
             <button id="tab-tools" class="tab-btn active">AI Tools</button>
+            <button id="tab-text2img" class="tab-btn">Text to Image</button>
             <button id="tab-image-editor" class="tab-btn">Image Editor</button>
             <button id="tab-background-remover" class="tab-btn">Background Remover</button>
             <button id="tab-colorizer" class="tab-btn">Colorizer</button>
             <button id="tab-super-resolution" class="tab-btn">Super Resolution</button>
             <button id="tab-waifu2x" class="tab-btn">Waifu2x</button>
             <button id="tab-creative-upscale" class="tab-btn">Creative Upscale</button>
-            <button id="tab-text2img" class="tab-btn">Text to Image</button>
             <button id="tab-inpainting" class="tab-btn">Inpainting</button>
         </div>
 
@@ -345,7 +430,10 @@
         <div id="image-editor-content" class="tab-content hidden">
             <div class="form-group">
                 <label for="editor-prompt">Editing Prompt</label>
-                <textarea id="editor-prompt" placeholder="Describe the changes you want to make to the image..."></textarea>
+                <div style="display: flex; gap: 10px;">
+                    <textarea id="editor-prompt" placeholder="Describe the changes you want to make to the image..." style="flex: 1;"></textarea>
+                    <button id="editor-prompt-manager-btn" class="btn-secondary" style="white-space: nowrap;" title="Insert from Prompt Manager">📋</button>
+                </div>
             </div>
 
             <div class="form-group">
@@ -356,7 +444,10 @@
 
             <div class="form-group">
                 <label for="editor-negative-prompt">Negative Prompt (Optional)</label>
-                <textarea id="editor-negative-prompt" placeholder="Specify what you DON'T want in the edited image..."></textarea>
+                <div style="display: flex; gap: 10px;">
+                    <textarea id="editor-negative-prompt" placeholder="Specify what you DON'T want in the edited image..." style="flex: 1;"></textarea>
+                    <button id="editor-negative-prompt-manager-btn" class="btn-secondary" style="white-space: nowrap;" title="Insert from Prompt Manager">📋</button>
+                </div>
             </div>
 
             <div class="form-group-row">
@@ -444,7 +535,10 @@
         <div id="text2img-content" class="tab-content hidden">
             <div class="form-group">
                 <label for="text2img-prompt">Text Prompt</label>
-                <textarea id="text2img-prompt" placeholder="Describe the image you want to generate..."></textarea>
+                <div style="display: flex; gap: 10px;">
+                    <textarea id="text2img-prompt" placeholder="Describe the image you want to generate..." style="flex: 1;"></textarea>
+                    <button id="text2img-prompt-manager-btn" class="btn-secondary" style="white-space: nowrap;" title="Insert from Prompt Manager">📋</button>
+                </div>
             </div>
 
             <div class="modal-buttons">
@@ -468,7 +562,10 @@
 
             <div class="form-group">
                 <label for="inpainting-prompt">Inpainting Prompt</label>
-                <textarea id="inpainting-prompt" placeholder="Describe what you want to fill in the masked area..."></textarea>
+                <div style="display: flex; gap: 10px;">
+                    <textarea id="inpainting-prompt" placeholder="Describe what you want to fill in the masked area..." style="flex: 1;"></textarea>
+                    <button id="inpainting-prompt-manager-btn" class="btn-secondary" style="white-space: nowrap;" title="Insert from Prompt Manager">📋</button>
+                </div>
             </div>
 
             <div class="modal-buttons">

@@ -22,7 +22,11 @@ export function populateImageModelSelector(elementsOverride = null) {
     }
 
     Object.entries(IMAGE_MODEL_STATS).forEach(([modelId, stats]) => {
+
         if (isI2iMode && !stats.i2i) {
+            return;
+        }
+        if (!isI2iMode && !stats.t2i) {
             return;
         }
 
@@ -57,6 +61,13 @@ export function populateImageModelSelector(elementsOverride = null) {
         select.appendChild(separator);
 
         customModels.forEach(model => {
+            if (isI2iMode && !model.supportsI2I) {
+                return;
+            }
+            if (!isI2iMode && !model.supportsT2I) {
+                return;
+            }
+
             const option = document.createElement('option');
             option.value = `custom:${model.id}`;
             option.textContent = `✨ ${model.name}`;
@@ -70,8 +81,8 @@ export function populateImageModelSelector(elementsOverride = null) {
             option.dataset.guidanceMin = '1';
             option.dataset.guidanceMax = '20';
             option.dataset.guidanceDefault = '7.5';
-            option.dataset.t2i = 'true';
-            option.dataset.i2i = 'true';
+            option.dataset.t2i = model.supportsT2I ? 'true' : 'false';
+            option.dataset.i2i = model.supportsI2I ? 'true' : 'false';
             option.dataset.maxResolution = '2048';
             option.dataset.supportedFormats = 'png,jpeg';
             select.appendChild(option);
@@ -139,7 +150,11 @@ export function populateAdvancedVideoModelSelector(elementsOverride = null) {
     }
 
     Object.entries(ADVANCED_VIDEO_MODEL_STATS).forEach(([modelId, stats]) => {
+        
         if (isI2vMode && !stats.i2v) {
+            return;
+        }
+        if (!isI2vMode && !stats.t2v) {
             return;
         }
 
@@ -176,6 +191,9 @@ export function populateAdvancedVideoModelSelector(elementsOverride = null) {
 
         customModels.forEach(model => {
             if (isI2vMode && !model.supportsI2V) {
+                return;
+            }
+            if (!isI2vMode && !model.supportsT2V) {
                 return;
             }
 

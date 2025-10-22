@@ -1,6 +1,3 @@
-// src/handlers/modelConstants.js
-
-
 export const IMAGE_MODEL_STATS = {
     'black-forest-labs/FLUX.1-schnell-Free': { 
         displayName: 'Together FLUX.1 Schnell (Free)', 
@@ -32,34 +29,34 @@ export const IMAGE_MODEL_STATS = {
     },
 
     'black-forest-labs/FLUX.1-kontext-dev': { 
-        displayName: 'FLUX.1 Kontext [dev] (Multi-Modal)', 
+        displayName: 'FLUX.1 Kontext [dev] (I2I Only)', 
         provider: 'togetherai', 
         costPerImage: 0.025,
         steps: { min: 10, max: 28, default: 20 }, 
         guidance: { min: 1.0, max: 20.0, default: 7.0 },
-        t2i: true,
+        t2i: false,
         i2i: true,
         supportedFormats: ['png', 'jpeg'],
         maxResolution: 1024,
     },
     'black-forest-labs/FLUX.1-kontext-pro': { 
-        displayName: 'FLUX.1 Kontext [pro] (Multi-Modal)', 
+        displayName: 'FLUX.1 Kontext [pro] (I2I Only)', 
         provider: 'togetherai', 
         costPerImage: 0.040,
         steps: { min: 10, max: 50, default: 25 }, 
         guidance: { min: 1.0, max: 20.0, default: 7.0 },
-        t2i: true,
+        t2i: false,
         i2i: true,
         supportedFormats: ['png', 'jpeg'],
         maxResolution: 2048,
     },
     'black-forest-labs/FLUX.1-kontext-max': { 
-        displayName: 'FLUX.1 Kontext [max] (Multi-Modal)', 
+        displayName: 'FLUX.1 Kontext [max] (I2I Only)', 
         provider: 'togetherai', 
         costPerImage: 0.080,
         steps: { min: 10, max: 100, default: 30 }, 
         guidance: { min: 1.0, max: 20.0, default: 7.0 },
-        t2i: true,
+        t2i: false,
         i2i: true,
         supportedFormats: ['png', 'jpeg'],
         maxResolution: 4096,

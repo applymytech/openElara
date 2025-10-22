@@ -1,6 +1,6 @@
 {
   "name": "openelara",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "ELARA, Enahnced Local Artificial Responsive Assistant. An Electron-based LLM access tool, with local RAG knowledge databases and file handling.",
   "main": "main.js",
   "scripts": {

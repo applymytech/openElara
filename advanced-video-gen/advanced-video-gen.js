@@ -29,6 +29,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     populateAdvancedVideoModelSelector(elements);
     updateAdvancedVideoControls(elements);
+    
+    window.electronAPI.onLoadPrompt((prompt) => {
+        const promptTextarea = document.getElementById('advanced-video-prompt');
+        if (promptTextarea) {
+            if (prompt.content && prompt.content.promptType === 'structured') {
+               
+                const parts = [];
+                if (prompt.content.character && prompt.content.character.trim()) parts.push(prompt.content.character);
+                if (prompt.content.scene && prompt.content.scene.trim()) parts.push(prompt.content.scene);
+                if (prompt.content.action && prompt.content.action.trim()) parts.push(prompt.content.action);
+                if (prompt.content.attire && prompt.content.attire.trim()) parts.push(prompt.content.attire);
+                if (prompt.content.effects && prompt.content.effects.trim()) parts.push(prompt.content.effects);
+                if (prompt.content.cameraMovement && prompt.content.cameraMovement.trim()) parts.push(`Camera: ${prompt.content.cameraMovement}`);
+                if (prompt.content.duration && prompt.content.duration.trim()) parts.push(`Duration: ${prompt.content.duration}`);
+                promptTextarea.value = parts.join(', ');
+            } else {
+                let contentText = '';
+                if (typeof prompt.content === 'string') {
+                    contentText = prompt.content;
+                } else if (prompt.content && prompt.content.text) {
+                    contentText = prompt.content.text;
+                }
+                promptTextarea.value = contentText;
+            }
+            
+            promptTextarea.focus();
+            promptTextarea.setSelectionRange(promptTextarea.value.length, promptTextarea.value.length);
+        }
+    });
 
     setupEventListeners();
 
@@ -43,10 +72,16 @@ function setupEventListeners() {
     const tabI2v = document.getElementById('tab-video-i2v');
 
     if (tabT2v) {
-        tabT2v.addEventListener('click', () => switchTab('t2v'));
+        tabT2v.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchTab('t2v');
+        });
     }
     if (tabI2v) {
-        tabI2v.addEventListener('click', () => switchTab('i2v'));
+        tabI2v.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchTab('i2v');
+        });
     }
 
     const modelSelect = document.getElementById('advanced-video-model-select');
@@ -143,14 +178,13 @@ function switchTab(mode) {
         tabT2v?.classList.add('active');
         tabI2v?.classList.remove('active');
         uploadGroup.style.display = 'none';
-        // Refresh model selector so I2V-only models are hidden on T2V tab
         populateAdvancedVideoModelSelector(elements);
         updateAdvancedVideoControls(elements);
     } else if (mode === 'i2v') {
         tabT2v?.classList.remove('active');
         tabI2v?.classList.add('active');
         uploadGroup.style.display = 'block';
-        // Refresh model selector so only I2V-capable models are shown on I2V tab
+        
         populateAdvancedVideoModelSelector(elements);
         updateAdvancedVideoControls(elements);
     }
@@ -161,9 +195,33 @@ async function executeAdvancedVideo(event) {
     const submitBtn = event.target;
     submitBtn.disabled = true;
 
+    try {
+        const currentTitle = document.title;
+        document.title = currentTitle + ' (Generating...)';
+        if (window.electronAPI && window.electronAPI.getCurrentWindow) {
+            const win = await window.electronAPI.getCurrentWindow();
+            if (win && win.setTitle) {
+                win.setTitle(currentTitle + ' (Generating...)');
+            }
+        }
+    } catch (e) {
+        console.warn('Could not update window title:', e);
+    }
+
     const log = document.getElementById('advanced-video-gen-log');
     log.classList.remove('hidden');
     log.textContent = 'Gathering Advanced Video settings...';
+
+    const removeProgressListener = window.electronAPI.onVideoGenProgress((data) => {
+        if (data.status && data.message) {
+            log.textContent = data.message;
+            if (data.status === 'failed') {
+                log.innerHTML = `<span style="color: var(--error-color)">❌ ${data.message}</span>`;
+            } else if (data.status === 'completed') {
+                log.innerHTML = `<span style="color: var(--success-color)">✅ ${data.message}</span>`;
+            }
+        }
+    });
 
     try {
         const isI2VActive = document.getElementById('tab-video-i2v')?.classList.contains('active');
@@ -329,17 +387,36 @@ async function executeAdvancedVideo(event) {
         log.textContent = `❌ Advanced Generation Failed: ${error.message}`;
         alert(`Advanced Video Failed: ${error.message}`);
     } finally {
+        if (removeProgressListener) removeProgressListener();
         submitBtn.disabled = false;
+        
+        try {
+            const currentTitle = document.title.replace(' (Generating...)', '');
+            document.title = currentTitle;
+            if (window.electronAPI && window.electronAPI.getCurrentWindow) {
+                const win = await window.electronAPI.getCurrentWindow();
+                if (win && win.setTitle) {
+                    win.setTitle(currentTitle);
+                }
+            }
+        } catch (e) {
+            console.warn('Could not reset window title:', e);
+        }
     }
 }
 
 async function showVideoPromptSelector() {
     const response = await window.electronAPI.getPrompts();
     const prompts = response?.prompts || response || [];
-    const videoPrompts = prompts.filter(p => p.type === 'video');
+    const videoPrompts = prompts.filter(p => p.type === 'video' || p.type === 'modifier');
 
     if (videoPrompts.length === 0) {
-        alert("No video prompts found. Create one in the Prompt Manager first!");
+        try {
+            await window.electronAPI.openPromptManager('advanced-video-gen');
+        } catch (error) {
+            console.error('Error opening prompt manager:', error);
+            alert('Failed to open Prompt Manager. Please try again.');
+        }
         return;
     }
 
@@ -347,48 +424,37 @@ async function showVideoPromptSelector() {
     if (selection) {
         const promptTextarea = document.getElementById('advanced-video-prompt');
         if (promptTextarea) {
-            if (selection.promptType === 'structured') {
+            if (selection.content && selection.content.promptType === 'structured') {
                 const parts = [];
-                if (selection.character && selection.character.trim()) parts.push(selection.character);
-                if (selection.scene && selection.scene.trim()) parts.push(selection.scene);
-                if (selection.action && selection.action.trim()) parts.push(selection.action);
-                if (selection.attire && selection.attire.trim()) parts.push(selection.attire);
-                if (selection.effects && selection.effects.trim()) parts.push(selection.effects);
-                if (selection.cameraMovement && selection.cameraMovement.trim()) parts.push(`Camera: ${selection.cameraMovement}`);
-                if (selection.duration && selection.duration.trim()) parts.push(`Duration: ${selection.duration}`);
+                if (selection.content.character && selection.content.character.trim()) parts.push(selection.content.character);
+                if (selection.content.scene && selection.content.scene.trim()) parts.push(selection.content.scene);
+                if (selection.content.action && selection.content.action.trim()) parts.push(selection.content.action);
+                if (selection.content.attire && selection.content.attire.trim()) parts.push(selection.content.attire);
+                if (selection.content.effects && selection.content.effects.trim()) parts.push(selection.content.effects);
+                if (selection.content.cameraMovement && selection.content.cameraMovement.trim()) parts.push(`Camera: ${selection.content.cameraMovement}`);
+                if (selection.content.duration && selection.content.duration.trim()) parts.push(`Duration: ${selection.content.duration}`);
                 promptTextarea.value = parts.join(', ');
             } else {
-                promptTextarea.value = selection.text || '';
+                let contentText = '';
+                if (typeof selection.content === 'string') {
+                    contentText = selection.content;
+                } else if (selection.content && selection.content.text) {
+                    contentText = selection.content.text;
+                }
+                promptTextarea.value = contentText;
             }
+            
+            promptTextarea.focus();
+            setTimeout(() => {
+                promptTextarea.setSelectionRange(promptTextarea.value.length, promptTextarea.value.length);
+            }, 50);
+            
+            showToast(`Prompt "${selection.name}" inserted`);
         }
     }
 }
 
-async function useDefaultVideoPrompt() {
-    const characterData = await window.electronAPI.getCharacterConstants();
-    const characterName = characterData.name || 'AI';
-    const description = characterData.description_safe || characterData.description || 'An AI character';
-    const attire = characterData.attire || 'futuristic outfit';
-
-    const defaultPrompt = `${description}, ${attire}, turning to face camera and waving, smiling, smooth camera movement, high quality video, cinematic lighting`;
-
-    const promptTextarea = document.getElementById('advanced-video-prompt');
-    if (promptTextarea) {
-        promptTextarea.value = defaultPrompt + '\n\n';
-
-        promptTextarea.focus();
-        promptTextarea.setSelectionRange(promptTextarea.value.length, promptTextarea.value.length);
-
-        alert(`${characterName} video template loaded!`);
-    }
-
-    const btn = document.getElementById('use-default-video-prompt-btn');
-    if (btn) {
-        btn.innerHTML = `✨ Use ${characterName} Template`;
-    }
-}
-
-async function showPromptSelectionModal(prompts, type) {
+async function showCharacterTemplateModal(characterData) {
     return new Promise((resolve) => {
         const overlay = document.createElement('div');
         overlay.className = 'modal';
@@ -399,32 +465,49 @@ async function showPromptSelectionModal(prompts, type) {
         modalContent.style.maxWidth = '500px';
 
         const title = document.createElement('h3');
-        title.textContent = `Select ${type === 'image' ? 'Image' : 'Video'} Prompt`;
+        title.textContent = `Select ${characterData.name} Template`;
         modalContent.appendChild(title);
+
+        const description = characterData.description_safe || characterData.description || 'An AI character';
+        const attire = characterData.attire || 'futuristic outfit';
+        const voiceProfile = characterData.voice_profile || '';
+
+        const options = [
+            { id: 'full', name: 'Full Description', value: `${description}, ${attire}` },
+            { id: 'description', name: 'Character Description Only', value: description },
+            { id: 'attire', name: 'Attire Only', value: attire },
+            { id: 'video', name: 'Video Action Template', value: `${description}, ${attire}, turning to face camera and waving, smiling, smooth camera movement, high quality video, cinematic lighting` }
+        ];
+
+        if (voiceProfile) {
+            options.push({ id: 'voice', name: 'Voice Profile', value: voiceProfile });
+        }
 
         const listDiv = document.createElement('div');
         listDiv.style.maxHeight = '400px';
         listDiv.style.overflowY = 'auto';
         listDiv.style.marginBottom = '20px';
 
-        prompts.forEach(prompt => {
+        options.forEach(option => {
             const item = document.createElement('div');
             item.className = 'prompt-item';
             item.style.cursor = 'pointer';
-            item.style.padding = '10px';
+            item.style.padding = '12px';
             item.style.border = '1px solid var(--border-color)';
             item.style.borderRadius = '5px';
             item.style.marginBottom = '10px';
             item.style.transition = 'background-color 0.2s';
 
             const nameSpan = document.createElement('strong');
-            nameSpan.textContent = prompt.name;
+            nameSpan.textContent = option.name;
             item.appendChild(nameSpan);
 
-            const typeSpan = document.createElement('small');
-            typeSpan.textContent = ` (${prompt.promptType || 'free'})`;
-            typeSpan.style.color = 'var(--secondary-text-color)';
-            item.appendChild(typeSpan);
+            const valueSpan = document.createElement('div');
+            valueSpan.textContent = option.value.substring(0, 60) + (option.value.length > 60 ? '...' : '');
+            valueSpan.style.fontSize = '0.85em';
+            valueSpan.style.color = 'var(--text-muted-color)';
+            valueSpan.style.marginTop = '5px';
+            item.appendChild(valueSpan);
 
             item.addEventListener('mouseenter', () => {
                 item.style.backgroundColor = 'var(--tertiary-bg-color)';
@@ -435,7 +518,7 @@ async function showPromptSelectionModal(prompts, type) {
 
             item.addEventListener('click', () => {
                 document.body.removeChild(overlay);
-                resolve(prompt);
+                resolve(option);
             });
 
             listDiv.appendChild(item);
@@ -446,6 +529,7 @@ async function showPromptSelectionModal(prompts, type) {
         const cancelBtn = document.createElement('button');
         cancelBtn.textContent = 'Cancel';
         cancelBtn.className = 'btn-secondary';
+        cancelBtn.style.marginRight = '10px';
         cancelBtn.addEventListener('click', () => {
             document.body.removeChild(overlay);
             resolve(null);
@@ -454,6 +538,227 @@ async function showPromptSelectionModal(prompts, type) {
         const btnDiv = document.createElement('div');
         btnDiv.style.textAlign = 'center';
         btnDiv.appendChild(cancelBtn);
+        modalContent.appendChild(btnDiv);
+
+        overlay.appendChild(modalContent);
+        document.body.appendChild(overlay);
+    });
+}
+
+async function useDefaultVideoPrompt() {
+    const characterData = await window.electronAPI.getCharacterConstants();
+    const characterName = characterData.name || 'AI';
+
+    const selection = await showCharacterTemplateModal(characterData);
+    if (!selection) return;
+
+    const promptTextarea = document.getElementById('advanced-video-prompt');
+    if (promptTextarea) {
+        promptTextarea.value = selection.value + '\n\n';
+        
+        promptTextarea.focus();
+        setTimeout(() => {
+            promptTextarea.setSelectionRange(promptTextarea.value.length, promptTextarea.value.length);
+        }, 50);
+
+        showToast(`${characterName} ${selection.name} template loaded!`);
+    }
+
+    const btn = document.getElementById('use-default-video-prompt-btn');
+    if (btn) {
+        btn.innerHTML = `✨ Use ${characterName} Template`;
+    }
+}
+
+function showToast(message) {
+    const existingToast = document.getElementById('advanced-gen-toast');
+    if (existingToast) {
+        existingToast.remove();
+    }
+    
+    const toast = document.createElement('div');
+    toast.id = 'advanced-gen-toast';
+    toast.textContent = message;
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: var(--accent-color);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 5px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 10000;
+        animation: slideIn 0.3s ease-out;
+    `;
+    document.body.appendChild(toast);
+    
+    if (!document.getElementById('toast-styles')) {
+        const style = document.createElement('style');
+        style.id = 'toast-styles';
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease-out';
+        setTimeout(() => toast.remove(), 300);
+    }, 2000);
+}
+
+async function showPromptSelectionModal(prompts, type) {
+    return new Promise((resolve) => {
+        const overlay = document.createElement('div');
+        overlay.className = 'modal';
+        overlay.style.zIndex = '1100';
+
+        const modalContent = document.createElement('div');
+        modalContent.className = 'modal-content';
+        modalContent.style.maxWidth = '600px';
+
+        const title = document.createElement('h3');
+        title.textContent = `Select ${type === 'image' ? 'Image' : 'Video'} Prompt`;
+        modalContent.appendChild(title);
+
+        const description = document.createElement('p');
+        description.textContent = 'Choose a saved prompt to insert into your generation. Only prompts of the correct type are shown.';
+        description.style.color = 'var(--text-muted-color)';
+        description.style.fontSize = '0.9em';
+        description.style.marginBottom = '15px';
+        modalContent.appendChild(description);
+
+        const listDiv = document.createElement('div');
+        listDiv.style.maxHeight = '400px';
+        listDiv.style.overflowY = 'auto';
+        listDiv.style.marginBottom = '20px';
+        const filteredPrompts = prompts.filter(p => p.type === 'video' || p.type === 'modifier');
+
+        if (filteredPrompts.length === 0) {
+            const noPrompts = document.createElement('div');
+            noPrompts.textContent = 'No saved video prompts found. Create one in the Prompt Manager first!';
+            noPrompts.style.padding = '20px';
+            noPrompts.style.textAlign = 'center';
+            noPrompts.style.color = 'var(--text-muted-color)';
+            listDiv.appendChild(noPrompts);
+        } else {
+            filteredPrompts.forEach(prompt => {
+                const item = document.createElement('div');
+                item.className = 'prompt-item';
+                item.style.cursor = 'pointer';
+                item.style.padding = '12px';
+                item.style.border = '1px solid var(--border-color)';
+                item.style.borderRadius = '5px';
+                item.style.marginBottom = '10px';
+                item.style.transition = 'background-color 0.2s';
+
+                const headerDiv = document.createElement('div');
+                headerDiv.style.display = 'flex';
+                headerDiv.style.justifyContent = 'space-between';
+                headerDiv.style.alignItems = 'center';
+                headerDiv.style.marginBottom = '5px';
+
+                const nameSpan = document.createElement('strong');
+                nameSpan.textContent = prompt.name;
+                headerDiv.appendChild(nameSpan);
+
+                const typeBadge = document.createElement('span');
+                typeBadge.textContent = prompt.type === 'video' ? '🎬 Video' : '🔧 Modifier';
+                typeBadge.style.fontSize = '0.8em';
+                typeBadge.style.background = 'var(--tertiary-bg-color)';
+                typeBadge.style.padding = '2px 6px';
+                typeBadge.style.borderRadius = '4px';
+                headerDiv.appendChild(typeBadge);
+
+                item.appendChild(headerDiv);
+
+                let previewText = '';
+                if (prompt.content && prompt.content.promptType === 'structured') {
+                    const parts = [];
+                    if (prompt.content.character) parts.push(prompt.content.character);
+                    if (prompt.content.scene) parts.push(prompt.content.scene);
+                    if (prompt.content.action) parts.push(prompt.content.action);
+                    if (prompt.content.attire) parts.push(prompt.content.attire);
+                    if (prompt.content.cameraMovement) parts.push(`Camera: ${prompt.content.cameraMovement}`);
+                    previewText = parts.join(', ');
+                } else if (prompt.content && prompt.content.text) {
+                    previewText = prompt.content.text;
+                }
+
+                if (previewText) {
+                    const previewDiv = document.createElement('div');
+                    previewDiv.textContent = previewText.substring(0, 80) + (previewText.length > 80 ? '...' : '');
+                    previewDiv.style.fontSize = '0.85em';
+                    previewDiv.style.color = 'var(--text-muted-color)';
+                    previewDiv.style.marginTop = '5px';
+                    item.appendChild(previewDiv);
+                }
+
+                item.addEventListener('mouseenter', () => {
+                    item.style.backgroundColor = 'var(--tertiary-bg-color)';
+                });
+                item.addEventListener('mouseleave', () => {
+                    item.style.backgroundColor = '';
+                });
+
+                item.addEventListener('click', () => {
+                    document.body.removeChild(overlay);
+                    resolve(prompt);
+                });
+
+                listDiv.appendChild(item);
+            });
+        }
+
+        modalContent.appendChild(listDiv);
+
+        const cancelBtn = document.createElement('button');
+        cancelBtn.textContent = 'Cancel';
+        cancelBtn.className = 'btn-secondary';
+        cancelBtn.style.marginRight = '10px';
+        cancelBtn.addEventListener('click', () => {
+            document.body.removeChild(overlay);
+            resolve(null);
+        });
+
+        const openManagerBtn = document.createElement('button');
+        openManagerBtn.textContent = 'Open Prompt Manager';
+        openManagerBtn.className = 'btn-primary';
+        openManagerBtn.addEventListener('click', async () => {
+            document.body.removeChild(overlay);
+            try {
+                await window.electronAPI.openPromptManager('advanced-video-gen');
+            } catch (error) {
+                console.error('Error opening prompt manager:', error);
+                alert('Failed to open Prompt Manager. Please try again.');
+            }
+        });
+
+        const btnDiv = document.createElement('div');
+        btnDiv.style.textAlign = 'center';
+        btnDiv.appendChild(cancelBtn);
+        btnDiv.appendChild(openManagerBtn);
         modalContent.appendChild(btnDiv);
 
         overlay.appendChild(modalContent);

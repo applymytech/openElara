@@ -95,11 +95,10 @@ class ContentWatermark:
 
     def embed_metadata_in_video(self, video_path: str, metadata: Dict[str, Any]) -> bool:
         try:
-            # Create a more comprehensive metadata file with standard tags
             metadata_file = video_path + '.metadata.txt'
             with open(metadata_file, 'w', encoding='utf-8') as f:
                 f.write(';FFMETADATA1\n')
-                # Standard metadata tags that most tools can read
+                
                 f.write(f'title=AI Generated Content - OpenElara\n')
                 f.write(f'artist=OpenElara v{str(metadata["version"])}\n')
                 f.write(f'comment={str(metadata["notice"])}\n')
@@ -110,7 +109,7 @@ class ContentWatermark:
                 f.write(f'genre=AI Generated\n')
                 f.write(f'composer=OpenElara AI System\n')
                 
-                # OpenElara specific tags for verification
+                
                 f.write(f'openelara_signature={str(metadata["content_signature"])}\n')
                 f.write(f'openelara_model={str(metadata["model"]["name"])}\n')
                 f.write(f'openelara_provider={str(metadata["model"]["provider"])}\n')
@@ -119,14 +118,14 @@ class ContentWatermark:
                 f.write(f'openelara_content_type={str(metadata["content_type"])}\n')
             
             temp_output = video_path + '.watermarked.mp4'
-            # Use more compatible ffmpeg command with additional metadata mapping
+            
             cmd = [
                 'ffmpeg',
                 '-i', video_path,
                 '-i', metadata_file,
-                '-map_metadata', '1',  # Map all metadata
-                '-movflags', '+faststart',  # Optimize for web streaming
-                '-c', 'copy',  # Copy streams without re-encoding
+                '-map_metadata', '1',  
+                '-movflags', '+faststart',  
+                '-c', 'copy',  
                 '-y',
                 temp_output
             ]
@@ -152,7 +151,11 @@ class ContentWatermark:
     def embed_metadata_in_image(self, image_path: str, metadata: Dict[str, Any]) -> bool:
         try:
             img = Image.open(image_path)
-            if image_path.lower().endswith('.png'):
+            
+            file_ext = os.path.splitext(image_path)[1].lower()
+            
+            if file_ext in ('.png',):
+                
                 png_info = PngInfo()
                 png_info.add_text('OpenElara:Generator', str(metadata['generator']))  # type: ignore
                 png_info.add_text('OpenElara:Version', str(metadata['version']))  # type: ignore
@@ -165,7 +168,8 @@ class ContentWatermark:
                 png_info.add_text('OpenElara:Metadata', json.dumps(metadata))  # type: ignore
                 img.save(image_path, format='PNG', pnginfo=png_info)
                 return True
-            elif image_path.lower().endswith(('.jpg', '.jpeg')):
+            elif file_ext in ('.jpg', '.jpeg'):
+                
                 exif_dict = img.getexif()
                 exif_dict[0x9286] = json.dumps(metadata)
                 exif_dict[0x0131] = f"OpenElara {metadata['version']}"
@@ -174,8 +178,33 @@ class ContentWatermark:
                 img.save(image_path, format='JPEG', exif=exif_dict, quality=95)
                 return True
             else:
-                return False
-        except Exception:
+                
+                img_format = img.format
+                if img_format == 'PNG':
+                    png_info = PngInfo()
+                    png_info.add_text('OpenElara:Generator', str(metadata['generator']))  # type: ignore
+                    png_info.add_text('OpenElara:Version', str(metadata['version']))  # type: ignore
+                    png_info.add_text('OpenElara:GeneratedAt', str(metadata['generated_at']))  # type: ignore
+                    png_info.add_text('OpenElara:Model', str(metadata['model']['name']))  # type: ignore
+                    png_info.add_text('OpenElara:Provider', str(metadata['model']['provider']))  # type: ignore
+                    png_info.add_text('OpenElara:Signature', str(metadata['content_signature']))  # type: ignore
+                    png_info.add_text('OpenElara:Notice', str(metadata['notice']))  # type: ignore
+                    png_info.add_text('OpenElara:ProvenanceID', str(metadata['provenance_id']))  # type: ignore
+                    png_info.add_text('OpenElara:Metadata', json.dumps(metadata))  # type: ignore
+                    img.save(image_path, format='PNG', pnginfo=png_info)
+                    return True
+                elif img_format == 'JPEG':
+                    exif_dict = img.getexif()
+                    exif_dict[0x9286] = json.dumps(metadata)
+                    exif_dict[0x0131] = f"OpenElara {metadata['version']}"
+                    exif_dict[0x013B] = "AI Generated - OpenElara"
+                    exif_dict[0x8298] = str(metadata['notice'])
+                    img.save(image_path, format='JPEG', exif=exif_dict, quality=95)
+                    return True
+                else:
+                    return False
+        except Exception as e:
+            print(f"Error embedding metadata in image {image_path}: {e}")
             return False
 
     def create_sidecar_metadata_file(self, content_path: str, metadata: Dict[str, Any]):
@@ -215,7 +244,7 @@ class ContentWatermark:
                 print(f"Embedding metadata in video: {content_path}")
                 self.embed_metadata_in_video(content_path, metadata)
         
-        # C2PA logic removed as per user request.
+        
         metadata['c2pa_signed'] = False
                 
         print(f"Creating sidecar metadata file for: {content_path}")
@@ -224,7 +253,7 @@ class ContentWatermark:
         return metadata
 
     def verify_watermark(self, content_path: str) -> Optional[Dict[str, Any]]:
-        # Always check for sidecar file first (this should work for all content types)
+        
         sidecar_path = content_path + '.openelara.json'
         if os.path.exists(sidecar_path):
             try:
@@ -236,7 +265,7 @@ class ContentWatermark:
                 print(f"Error reading sidecar file {sidecar_path}: {e}")
                 pass
         
-        # For images, check embedded metadata
+        
         try:
             img = Image.open(content_path)
             if content_path.lower().endswith('.png'):
@@ -247,7 +276,7 @@ class ContentWatermark:
                     return result
             elif content_path.lower().endswith(('.jpg', '.jpeg')):
                 exif_dict = img.getexif()
-                meta = exif_dict.get(0x9286)  # UserComment tag
+                meta = exif_dict.get(0x9286)  
                 if meta:
                     result = json.loads(meta)
                     print(f"Found JPEG embedded metadata: {result}")
@@ -256,19 +285,18 @@ class ContentWatermark:
             print(f"Error reading image metadata from {content_path}: {e}")
             pass
         
-        # For videos, check embedded metadata using ffprobe
+        
         try:
             if content_path.lower().endswith(('.mp4', '.mov', '.avi', '.mkv')):
-                # First check for OpenElara specific tags
+                
                 result = subprocess.run(['ffprobe', '-v', 'quiet', '-print_format', 'json', '-show_format', '-show_streams', content_path], capture_output=True, text=True)
                 if result.returncode == 0:
                     probe_data = json.loads(result.stdout)
                     format_tags = probe_data.get('format', {}).get('tags', {})
                     
-                    # Look for OpenElara metadata in video tags
-                    print(f"Video format tags: {format_tags}")
                     
-                    # Check for embedded JSON metadata first
+                    print(f"Video format tags: {format_tags}")
+
                     for key, value in format_tags.items():
                         if 'openelara' in key.lower() and 'metadata' in key.lower():
                             try:
@@ -280,11 +308,10 @@ class ContentWatermark:
                                 print(f"Error parsing JSON metadata from tag {key}: {e}")
                                 pass
                     
-                    # Check for description field which might contain our JSON
                     if 'description' in format_tags:
                         desc = format_tags['description']
                         if 'Metadata:' in desc and desc.endswith('}'):
-                            # Extract JSON part from description
+                            
                             json_start = desc.find('Metadata:') + 10
                             json_part = desc[json_start:]
                             try:
@@ -295,11 +322,11 @@ class ContentWatermark:
                                 print(f"Error parsing metadata from description: {e}")
                                 pass
                     
-                    # Check for OpenElara specific tags
+                    
                     openelara_tags = {k: v for k, v in format_tags.items() if 'openelara' in k.lower()}
                     if openelara_tags:
                         print(f"Found OpenElara tags: {openelara_tags}")
-                        # Create a basic metadata object from available tags
+                        
                         metadata: Dict[str, Any] = {
                             'generator': 'OpenElara',
                             'notice': format_tags.get('comment', 'AI-generated content'),

@@ -3,6 +3,9 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 const electronAPI = {
+    // Window Management
+    getCurrentWindow: () => ipcRenderer.invoke('get-current-window'),
+    
     // API Key Management
     getApiKeys: () => ipcRenderer.invoke('get-api-keys'),
     saveApiKeys: (keys) => ipcRenderer.invoke('save-api-keys', keys),
@@ -73,10 +76,12 @@ const electronAPI = {
     openScrapyOutputFolder: () => ipcRenderer.invoke('open-scrapy-output-folder'),
     clearScrapyOutputFolder: () => ipcRenderer.invoke('clear-scrapy-output-folder'),
     
-    // OUTPUT FOLDER HANDLERS
+    // Output Folders
     openImagesOutputFolder: () => ipcRenderer.invoke('openImagesOutputFolder'),
     openVideosOutputFolder: () => ipcRenderer.invoke('openVideosOutputFolder'),
     openConversionsOutputFolder: () => ipcRenderer.invoke('openConversionsOutputFolder'),
+    openSignedOutputFolder: () => ipcRenderer.invoke('open-signed-output-folder'),
+    clearSignedOutputFolder: () => ipcRenderer.invoke('clear-signed-output-folder'),
 
     // RAG & Database
     runIngestion: (filePaths) => ipcRenderer.invoke('run-ingestion', filePaths),
@@ -97,14 +102,14 @@ const electronAPI = {
     openFileConverter: () => ipcRenderer.invoke('open-file-converter'),
     openScrapyWindow: () => ipcRenderer.invoke('open-scrapy-window'),
     openPowerKnowledge: () => ipcRenderer.invoke('open-power-knowledge'),
-    openPromptManager: () => ipcRenderer.invoke('open-prompt-manager'),
+    openPromptManager: (parentWindowType = null) => ipcRenderer.invoke('open-prompt-manager', parentWindowType),
     openActionManager: () => ipcRenderer.invoke('open-action-manager'),
     openSigner: () => ipcRenderer.invoke('open-signer'),
     openAdvancedImageGenWindow: () => ipcRenderer.invoke('open-advanced-image-gen-window'),
     openAdvancedVideoGenWindow: () => ipcRenderer.invoke('open-advanced-video-gen-window'),
     openDeepaiStudioWindow: () => ipcRenderer.invoke('open-deepai-studio-window'),
 
-    // GENERATIVE APIs (Updated/New)
+    // Generative AI
     generateSelfie: (payload) => ipcRenderer.invoke('generate-selfie', payload),
     generateOpenImage: (payload) => ipcRenderer.invoke('generate-open-image', payload),
     generateVideoPrompt: (payload) => ipcRenderer.invoke('generate-video-prompt', payload),

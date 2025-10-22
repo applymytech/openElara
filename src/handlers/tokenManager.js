@@ -78,7 +78,9 @@ export async function setupTokenManager(state, personalityTokenLimit = 0) {
         outputValue = Math.floor(effectiveMaxOutput * state.tokenSettings.outputPercentage);
     }
 
-    outputValue = Math.max(256, Math.min(outputValue, effectiveMaxOutput));
+    // Use 2048 or 10% of effectiveMaxOutput, whichever is greater, as the minimum
+    const minOutput = Math.max(2048, Math.floor(effectiveMaxOutput * 0.1));
+    outputValue = Math.max(minOutput, Math.min(outputValue, effectiveMaxOutput));
     
     elements.outputLimitSlider.value = outputValue;
     elements.outputLimitInput.value = outputValue;

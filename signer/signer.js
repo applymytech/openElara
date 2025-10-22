@@ -11,7 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedFilesSection: document.getElementById('selectedFilesSection'),
         selectedFilesList: document.getElementById('selectedFilesList'),
         signFilesBtn: document.getElementById('signFilesBtn'),
-        statusContainer: document.getElementById('statusContainer')
+        statusContainer: document.getElementById('statusContainer'),
+        openSignedFolderBtn: document.getElementById('openSignedFolderBtn'),
+        clearSignedFolderBtn: document.getElementById('clearSignedFolderBtn')
     };
 
     let selectedFiles = [];
@@ -107,4 +109,31 @@ document.addEventListener('DOMContentLoaded', () => {
             elements.signFilesBtn.disabled = false;
         }
     });
+
+    if (elements.openSignedFolderBtn) {
+        elements.openSignedFolderBtn.addEventListener('click', async () => {
+            try {
+                await window.electronAPI.openSignedOutputFolder();
+            } catch (error) {
+                showStatus(`Error opening signed folder: ${error.message}`, 'error');
+            }
+        });
+    }
+
+    if (elements.clearSignedFolderBtn) {
+        elements.clearSignedFolderBtn.addEventListener('click', async () => {
+            if (confirm('Are you sure you want to delete ALL files from the Signed folder? This cannot be undone.')) {
+                try {
+                    const result = await window.electronAPI.clearSignedOutputFolder();
+                    if (result.success) {
+                        showStatus(result.message, 'success');
+                    } else {
+                        showStatus(`Error clearing signed folder: ${result.error}`, 'error');
+                    }
+                } catch (error) {
+                    showStatus(`Error clearing signed folder: ${error.message}`, 'error');
+                }
+            }
+        });
+    }
 });

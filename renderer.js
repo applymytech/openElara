@@ -240,7 +240,7 @@ window.addMessageToHistory = (role, content, thinking) => {
     
     if (thinking && thinking.length > 0) {
         state.lastThinkingOutput = thinking;
-          } else {
+    } else if (role === 'assistant' && thinking === undefined) {
         state.lastThinkingOutput = '';
     }
 

@@ -16,7 +16,7 @@
         }
 
         .image-gen-container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
             background: rgba(30, 30, 30, 0.95);
             border-radius: 15px;
@@ -67,6 +67,9 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .tab-btn:hover {
@@ -113,7 +116,7 @@
         }
 
         textarea {
-            min-height: 100px;
+            min-height: 120px;
             resize: vertical;
             font-family: 'Consolas', 'Courier New', monospace;
         }
@@ -259,6 +262,27 @@
         .previews-container::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
+
+        .prompt-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .prompt-buttons .btn-secondary {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .tool-description {
+            background: rgba(167, 139, 250, 0.1);
+            border-left: 3px solid #a78bfa;
+            padding: 15px;
+            border-radius: 0 6px 6px 0;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 
@@ -271,6 +295,10 @@
         </div>
         <h1>🎨 Advanced Image Generation</h1>
         <p class="subtitle">Create stunning AI-generated images with advanced controls</p>
+        
+        <div class="tool-description">
+            <p>Use this tool to generate high-quality images with precise control over models, prompts, and parameters. Switch between Text-to-Image (T2I) and Image-to-Image (I2I) modes using the tabs above.</p>
+        </div>
 
         <div class="tab-navigation">
             <button id="tab-image-t2i" class="tab-btn active">Text-to-Image (T2I)</button>
@@ -284,9 +312,9 @@
 
         <div class="form-group">
             <label for="image-prompt">Prompt</label>
-            <div style="display: flex; gap: 10px; margin-bottom: 5px;">
-                <button id="insert-image-prompt-btn" class="btn-secondary" style="flex-shrink: 0;">📋 Insert from Prompt Manager</button>
-                <button id="use-default-image-prompt-btn" class="btn-secondary" style="flex-shrink: 0;">✨ Use Template</button>
+            <div class="prompt-buttons">
+                <button id="insert-image-prompt-btn" class="btn-secondary">📋 Insert from Prompt Manager</button>
+                <button id="use-default-image-prompt-btn" class="btn-secondary">✨ Use Template</button>
             </div>
             <textarea id="image-prompt" placeholder="A futuristic city at sunset..."></textarea>
         </div>

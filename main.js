@@ -447,6 +447,36 @@ function createAdvancedImageGenWindow() {
         },
     });
 
+    // Prevent window from closing if there's an active generation task
+    imageGenWindow.on('close', (event) => {
+        const title = imageGenWindow.getTitle();
+        if (title.includes('(Generating...)')) {
+            const choice = require('electron').dialog.showMessageBoxSync(imageGenWindow, {
+                type: 'question',
+                buttons: ['Cancel Generation', 'Keep Running in Background', 'Wait for Completion'],
+                defaultId: 2,
+                cancelId: 1,
+                title: 'Image Generation in Progress',
+                message: 'An image generation task is currently in progress.',
+                detail: 'You can cancel the generation, keep it running in the background, or wait for it to complete.'
+            });
+
+            if (choice === 0) {
+                // Cancel generation - close window normally
+                return;
+            } else if (choice === 1) {
+                // Keep running in background - hide window but don't close
+                event.preventDefault();
+                imageGenWindow.hide();
+                return false;
+            } else {
+                // Wait for completion - prevent closing
+                event.preventDefault();
+                return false;
+            }
+        }
+    });
+
     imageGenWindow.loadFile(path.join(__dirname, 'advanced-image-gen', 'advanced-image-gen.html'));
     
     return imageGenWindow;
@@ -464,6 +494,36 @@ function createAdvancedVideoGenWindow() {
             contextIsolation: true,
             devTools: !app.isPackaged,
         },
+    });
+
+    // Prevent window from closing if there's an active generation task
+    videoGenWindow.on('close', (event) => {
+        const title = videoGenWindow.getTitle();
+        if (title.includes('(Generating...)')) {
+            const choice = require('electron').dialog.showMessageBoxSync(videoGenWindow, {
+                type: 'question',
+                buttons: ['Cancel Generation', 'Keep Running in Background', 'Wait for Completion'],
+                defaultId: 2,
+                cancelId: 1,
+                title: 'Video Generation in Progress',
+                message: 'A video generation task is currently in progress.',
+                detail: 'You can cancel the generation, keep it running in the background, or wait for it to complete.'
+            });
+
+            if (choice === 0) {
+                // Cancel generation - close window normally
+                return;
+            } else if (choice === 1) {
+                // Keep running in background - hide window but don't close
+                event.preventDefault();
+                videoGenWindow.hide();
+                return false;
+            } else {
+                // Wait for completion - prevent closing
+                event.preventDefault();
+                return false;
+            }
+        }
     });
 
     videoGenWindow.loadFile(path.join(__dirname, 'advanced-video-gen', 'advanced-video-gen.html'));
@@ -490,7 +550,7 @@ function createDeepAIStudioWindow() {
     return deepaiWindow;
 }
 
-function createPromptManagerWindow() {
+function createPromptManagerWindow(parentWindowType = null) {
     const promptWindow = new BrowserWindow({
         width: 1200,
         height: 800,
@@ -504,7 +564,12 @@ function createPromptManagerWindow() {
         },
     });
 
-    promptWindow.loadFile(path.join(__dirname, 'prompt-manager', 'prompt-manager.html'));
+    // Pass parent window type as a query parameter
+    const url = parentWindowType 
+        ? `file://${path.join(__dirname, 'prompt-manager', 'prompt-manager.html')}?parent=${parentWindowType}`
+        : `file://${path.join(__dirname, 'prompt-manager', 'prompt-manager.html')}`;
+    
+    promptWindow.loadURL(url);
     
     return promptWindow;
 }

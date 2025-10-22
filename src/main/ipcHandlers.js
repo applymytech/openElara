@@ -45,6 +45,10 @@ const setupIpcHandlers = (mainWindow, app) => {
     
     const { buildChatSystemPrompt } = require('./promptConstants');
     
+    ipcMain.handle('get-current-window', (event) => {
+        return event.sender.getOwnerBrowserWindow();
+    });
+    
     ipcMain.handle('get-system-instruction', (event, { userName, personalityText, outputTokenLimit }) => {
         const character = getActiveCharacter();
         return buildChatSystemPrompt(
@@ -105,7 +109,8 @@ const setupIpcHandlers = (mainWindow, app) => {
             description_safe: character.CHARACTER_DESCRIPTION_SAFE,
             attire: character.CHARACTER_ATTIRE,
             iconPath: character.CHARACTER_ICON_PATH,
-            negativePrompt: character.CHARACTER_NEGATIVE_PROMPT
+            negativePrompt: character.CHARACTER_NEGATIVE_PROMPT,
+            voice_profile: character.CHARACTER_VOICE_PROFILE
         };
     });
 
@@ -140,9 +145,9 @@ const setupIpcHandlers = (mainWindow, app) => {
     });
     
     // --- POPUP WINDOW HANDLERS ---
-    ipcMain.handle('open-prompt-manager', () => {
+    ipcMain.handle('open-prompt-manager', (event, parentWindowType = null) => {
         const { createPromptManagerWindow } = getWindowCreators();
-        createPromptManagerWindow();
+        createPromptManagerWindow(parentWindowType);
         return { success: true };
     });
     
@@ -200,8 +205,20 @@ const setupIpcHandlers = (mainWindow, app) => {
             if (!prompt) {
                 return { success: false, error: 'Prompt not found' };
             }
+            const { BrowserWindow } = require('electron');
+            const allWindows = BrowserWindow.getAllWindows();
             
-            if (mainWindow && !mainWindow.isDestroyed()) {
+            const advancedImageWindow = allWindows.find(win => 
+                win.getTitle().includes('Advanced Image Generation'));
+            const advancedVideoWindow = allWindows.find(win => 
+                win.getTitle().includes('Advanced Video Generation'));
+            
+            if (advancedImageWindow && !advancedImageWindow.isDestroyed() && prompt.type === 'image') {
+                advancedImageWindow.webContents.send('load-prompt', prompt);
+            } else if (advancedVideoWindow && !advancedVideoWindow.isDestroyed() && prompt.type === 'video') {
+                advancedVideoWindow.webContents.send('load-prompt', prompt);
+            } else if (mainWindow && !mainWindow.isDestroyed()) {
+                
                 mainWindow.webContents.send('load-prompt', prompt);
             }
             

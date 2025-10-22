@@ -444,7 +444,7 @@ export async function executeAdvancedVideo(state, elements) {
     }
     try {
         let executionMessage = `Requesting Advanced Video (${isI2VActive ? 'I2V' : 'T2V'}) via ${payload.modelId}.`;
-        // 1. Handle I2V mode and image upload
+
         if (isI2VActive) {
             const imageFile = elements.advancedVideoImageUpload.files[0];
             if (!imageFile) {
@@ -461,7 +461,7 @@ export async function executeAdvancedVideo(state, elements) {
             executionMessage = `Requesting Advanced Video (I2V) via ${payload.modelId} using image: ${imageFile.name}.`;
         }
         addMessage(`*${executionMessage}*`, 'user');
-        // 2. Call the unified IPC handler
+        
         log.textContent = `🎬 Generating video... This might take a few minutes, but you can keep chatting!`;
 
         const thinkingMessage = addMessage('', 'ai');
@@ -1070,7 +1070,7 @@ Query: "${query}"*`, 'user');
             }
             let outputMessage = '';
             let contentToSave = '';
-            const sourceUrls = webTaskResult.sourceUrls || []; // New
+            const sourceUrls = webTaskResult.sourceUrls || [];
             if (state.currentTask === 'search' || state.currentTask === 'similar') {
                 const results = webTaskResult.results;
                 if (results && results.length > 0) {
@@ -1400,6 +1400,8 @@ export const handlePersonalityManagement = {
                 await window.electronAPI.savePersonality({ name, text, tokenLimit });
                 showStatusMessage(`Modifier '${name}' saved successfully.`, 'success');
                 handlePersonalityManagement.hideAddEditModal();
+                
+                const { initializePersonalitySelector } = await import('./initializers.js');
                 await initializePersonalitySelector();
             } catch (error) {
                 showStatusMessage(`Error saving modifier: ${error.message}`, 'error');
@@ -2160,8 +2162,19 @@ export const handleThinkingModal = {
     showThinking: (state) => {
         const modal = document.getElementById('thinking-modal');
         const content = document.getElementById('thinking-content');
-        if (modal && content && state.lastThinkingOutput) {
-            content.textContent = state.lastThinkingOutput;
+        if (modal && content) {
+            if (state.lastThinkingOutput && state.lastThinkingOutput.length > 0) {
+                
+                const formattedThinking = state.lastThinkingOutput
+                    .replace(/\\n/g, '\n')
+                    .replace(/\\t/g, '\t');
+                content.textContent = formattedThinking;
+                
+                
+                console.log('[Thinking Modal] Displaying full thinking output:', formattedThinking.substring(0, 100) + '...');
+            } else {
+                content.textContent = "No thinking process available. The AI may not have generated reasoning steps for the last response, or the model may not support explicit thinking output.";
+            }
             modal.classList.remove('hidden');
         }
     },

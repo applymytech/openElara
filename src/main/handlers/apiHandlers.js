@@ -322,8 +322,6 @@ function createMessagesWithAttachment(history, attachedContent, contextCanvasFil
     const messages = JSON.parse(JSON.stringify(history));
     let lastUserMessage = messages.findLast((m) => m.role === 'user');
     
-    // If there is no user message (history may have been trimmed), but we have an attachment,
-    // create a synthetic user message so the attachment is delivered to the model.
     if (!lastUserMessage && attachedContent) {
         const synthetic = { role: 'user', content: '' };
         messages.push(synthetic);
@@ -360,77 +358,10 @@ function createMessagesWithAttachment(history, attachedContent, contextCanvasFil
 
 function extractAndCleanThought(content) {
     if (!content || typeof content !== 'string') return { cleanedAnswer: content, extractedThinking: '' };
-    const thoughtRegex = /<[^>]*?(?:thinking|thought|thoughts|reasoning|reason|plan|planning|think|analysis|analyzing|reflection|reflecting|consideration|considering|deliberation|deliberating|ponder|pondering|contemplate|contemplating|muse|musing|cogitate|cogitating|brainstorm|brainstorming|evaluate|evaluating|assess|assessing|review|reviewing|examine|examining)[^>]*>[\s\S]*?<\/[^>]*?(?:thinking|thought|thoughts|reasoning|reason|plan|planning|think|analysis|analyzing|reflection|reflecting|consideration|considering|deliberation|deliberating|ponder|pondering|contemplate|contemplating|muse|musing|cogitate|cogitating|brainstorm|brainstorming|evaluate|evaluating|assess|assessing|review|reviewing|examine|examining)[^>]*>|<[^>]*?(?:thinking|thought|thoughts|reasoning|reason|plan|planning|think|analysis|analyzing|reflection|reflecting|consideration|considering|deliberation|deliberating|ponder|pondering|contemplate|contemplating|muse|musing|cogitate|cogitating|brainstorm|brainstorming|evaluate|evaluating|assess|assessing|review|reviewing|examine|examining)[^>]*\/>/gi;
-    const reasoningPrefixRegex = /^[\s\S]*?(Here are my reasoning steps:[\s\S]*?)(?=\n\n[A-Z]|$)/i;
-
-    let thoughts = [];
-    let match;
-
-    while ((match = thoughtRegex.exec(content)) !== null) {
-        thoughts.push(match[0].trim());
-    }
-
-    const untaggedThinkingRegex = /(?:^|\n)(thinking|thought|thoughts|reasoning|reason|plan|planning|analysis|analyzing|reflection|reflecting|consideration|considering|deliberation|deliberating|ponder|pondering|contemplate|contemplating|muse|musing|cogitate|cogitating|brainstorm|brainstorming|evaluate|evaluating|assess|assessing|review|reviewing|examine|examining)[\s\S]*?(?=\n\n|\n[A-Z]|\nI |\nThe |\nYou |\nThis |$)/gi;
-    while ((match = untaggedThinkingRegex.exec(content)) !== null) {
-        const alreadyExtracted = thoughts.some(thought => thought.includes(match[0]));
-        if (!alreadyExtracted && match[0].trim().length > 10) {
-            thoughts.push(match[0].trim());
-        }
-    }
-
-    const reasoningMatch = content.match(reasoningPrefixRegex);
-    if (reasoningMatch) {
-        thoughts.push(reasoningMatch[1].trim());
-    }
-
-    const conflictIndicators = /\s+(But|However|Wait|Actually|On second thought|There's a conflict|Let me think|I need to|The system says|The user says|Wait a minute|Hold on|system prompt|instructions|task|must|output|scene|description|perspective|setting|lighting|photo|detailed|photorealistic|thinking|thought|thoughts|reasoning|reason|plan|planning|analysis|analyzing|reflection|reflecting|consideration|considering|deliberation|deliberating|ponder|pondering|contemplate|contemplating|muse|musing|cogitate|cogitating|brainstorm|brainstorming|evaluate|evaluating|assess|assessing|review|reviewing|examine|examining)/i;
-    const conflictMatch = content.match(conflictIndicators);
-    if (conflictMatch) {
-        const conflictIndex = conflictMatch.index;
-        const potentialAnswer = content.substring(0, conflictIndex).trim();
-        const potentialThinking = content.substring(conflictIndex).trim();
-        if (potentialAnswer.length > 20 && potentialThinking.length > 10 &&
-            !potentialThinking.includes('I ') && !potentialThinking.includes('my ') && !potentialThinking.includes('me ') &&
-            (potentialThinking.includes('user') || potentialThinking.includes('system') ||
-             potentialThinking.includes('conflict') || potentialThinking.includes('think') ||
-             potentialThinking.includes('reasoning') || potentialThinking.includes('prompt') ||
-             potentialThinking.includes('instruction') || potentialThinking.includes('task') ||
-             potentialThinking.includes('perspective') || potentialThinking.includes('setting') ||
-             potentialThinking.includes('lighting') || potentialThinking.includes('photo') ||
-             potentialThinking.includes('detailed') || potentialThinking.includes('photorealistic'))) {
-            thoughts.push(potentialThinking);
-        }
-    }
-
-    const sentences = content.split(/[.!?]+/).map(s => s.trim()).filter(s => s.length > 0);
-    const firstPersonSentences = sentences.filter(s => /\b(I|my|me)\b/i.test(s));
-    const nonFirstPersonSentences = sentences.filter(s => !/\b(I|my|me)\b/i.test(s));
-    if (firstPersonSentences.length > 0 && nonFirstPersonSentences.length > 0) {
-        thoughts.push(nonFirstPersonSentences.join('. ') + '.');
-    }
-
-    let cleanedAnswer = content;
-    for (const thought of thoughts) {
-        cleanedAnswer = cleanedAnswer.replace(thought, '');
-    }
-
-    cleanedAnswer = cleanedAnswer.replace(thoughtRegex, '').trim();
-
-    const startBraceIndex = cleanedAnswer.indexOf('{');
-    const endBraceIndex = cleanedAnswer.lastIndexOf('}');
-
-    if (startBraceIndex !== -1 && endBraceIndex > startBraceIndex) {
-        const potentialJson = cleanedAnswer.substring(startBraceIndex, endBraceIndex + 1);
-        try {
-            JSON.parse(potentialJson);
-            cleanedAnswer = potentialJson;
-        } catch (e) {
-        }
-    }
-
-    cleanedAnswer = cleanedAnswer.replace(/\n{3,}/g, '\n\n').trim();
-
-    return { cleanedAnswer, extractedThinking: thoughts.join('\n\n') };
+    const cleanedAnswer = content.trim();
+    const extractedThinking = content.trim();
+    
+    return { cleanedAnswer, extractedThinking };
 }
 
 async function handleOllamaRequest(payload, apiKeys) {

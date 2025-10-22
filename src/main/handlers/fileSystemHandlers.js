@@ -10,6 +10,7 @@ const OUTPUT_SCRAPY = path.join(OUTPUT_ROOT, 'scrapy');
 const OUTPUT_IMAGES = path.join(OUTPUT_ROOT, 'images');
 const OUTPUT_VIDEOS = path.join(OUTPUT_ROOT, 'videos');
 const OUTPUT_CONVERSIONS = path.join(OUTPUT_ROOT, 'conversions');
+const OUTPUT_SIGNED = path.join(OUTPUT_ROOT, 'signed');
 
 const ensureOutputSubdirs = async () => {
     log.info(`Ensuring output subdirectories exist...`);
@@ -21,6 +22,7 @@ const ensureOutputSubdirs = async () => {
     await fs.mkdir(OUTPUT_IMAGES, { recursive: true });
     await fs.mkdir(OUTPUT_VIDEOS, { recursive: true });
     await fs.mkdir(OUTPUT_CONVERSIONS, { recursive: true });
+    await fs.mkdir(OUTPUT_SIGNED, { recursive: true });
     
     log.info(`Output subdirectories creation attempted`);
 };
@@ -234,6 +236,18 @@ const setupFileSystemHandlers = (mainWindow) => {
             return { success: true, message: "Scrapy output folder cleared." };
         } catch (error) {
             log.error(`Failed to clear Scrapy output folder: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    });
+
+    ipcMain.handle('open-signed-output-folder', () => shell.openPath(OUTPUT_SIGNED));
+    ipcMain.handle('clear-signed-output-folder', async () => {
+        try {
+            const files = await fs.readdir(OUTPUT_SIGNED);
+            await Promise.all(files.map(file => fs.unlink(path.join(OUTPUT_SIGNED, file))));
+            return { success: true, message: "Signed output folder cleared." };
+        } catch (error) {
+            log.error(`Failed to clear signed output folder: ${error.message}`);
             return { success: false, error: error.message };
         }
     });
