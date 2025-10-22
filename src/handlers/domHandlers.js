@@ -1444,7 +1444,7 @@ export function initializeElements() {
     elements.personaSelect = document.getElementById('personality-select');
 }
 
-export function addMessage(message, sender, attachmentName = null, isImage = false) {
+export function addMessage(message, sender, attachmentName = null, isImage = false, thinking = null) {
     const messageElement = document.createElement('div');
     messageElement.classList.add('message', `${sender}-message`);
 
@@ -1491,6 +1491,22 @@ export function addMessage(message, sender, attachmentName = null, isImage = fal
     }
 
     messageContentWrapper.appendChild(contentElement);
+
+    // Handle thinking content for AI messages
+    if (sender === 'ai' && thinking && thinking.length > 0) {
+        // Store thinking content in global state
+        if (typeof window !== 'undefined' && window.state) {
+            window.state.lastThinkingOutput = thinking;
+        }
+        
+        // Add thinking indicator with link
+        const thinkingIndicator = document.createElement('div');
+        thinkingIndicator.classList.add('thinking-indicator');
+        thinkingIndicator.innerHTML = `
+            <a href="#" class="thinking-link" onclick="window.handleThinkingModal?.showThinking(window.state); return false;">View Thinking Process</a>
+        `;
+        messageContentWrapper.appendChild(thinkingIndicator);
+    }
 
     if (attachmentName) {
         const attachmentElement = document.createElement('div');

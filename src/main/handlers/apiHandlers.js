@@ -358,8 +358,202 @@ function createMessagesWithAttachment(history, attachedContent, contextCanvasFil
 
 function extractAndCleanThought(content) {
     if (!content || typeof content !== 'string') return { cleanedAnswer: content, extractedThinking: '' };
-    const cleanedAnswer = content.trim();
-    const extractedThinking = content.trim();
+    
+    // Extended regex patterns for different thinking tags
+    const thoughtRegex = /<(think|thinking|thought|thoughts|reason|reasoning|plan|planning|analysis|analyzing|reflection|reflecting|consideration|considering|deliberation|deliberating|ponder|pondering|cogitate|cogitating|brainstorm|brainstorming|evaluate|evaluating|assess|assessing|review|reviewing|examine|examining|contemplate|contemplating|meditate|meditating|analyze|analyse|rationale|rationalize|deduce|deducing|infer|inferring|conclude|concluding|decide|deciding|choose|choosing|determine|determining|resolve|resolving|judge|judging|weigh|weighing|scrutinize|scrutinizing|inspect|inspecting|investigate|investigating|explore|exploring|probe|probing|research|researching|study|studying|examine|examining|deliberate|deliberating|debate|debating|discuss|discussing|argue|arguing|reason|reasoning|logic|logical|rationale|process|processing|workout|workingout|figureout|figuringout)>([\s\S]*?)<\/\1>/gi;
+    const untaggedThinkingRegex = /(?:^|\n)(think|thinking|thought|thoughts|reason|reasoning|plan|planning|analysis|analyzing|reflection|reflecting|consideration|considering|deliberation|deliberating|ponder|pondering|cogitate|cogitating|brainstorm|brainstorming|evaluate|evaluating|assess|assessing|review|reviewing|examine|examining|contemplate|contemplating|meditate|meditating|analyze|analyse|rationale|rationalize|deduce|deducing|infer|inferring|conclude|concluding|decide|deciding|choose|choosing|determine|determining|resolve|resolving|judge|judging|weigh|weighing|scrutinize|scrutinizing|inspect|inspecting|investigate|investigating|explore|exploring|probe|probing|research|researching|study|studying|examine|examining|deliberate|deliberating|debate|debating|discuss|discussing|argue|arguing|reason|reasoning|logic|logical|rationale|process|processing|workout|workingout|figureout|figuringout)[\s\S]*?(?=\n\n|\n[A-Z]|\nI |\nThe |\nYou |\nThis |$)/gi;
+    const reasoningPrefixRegex = /^[\s\S]*?(Here are my (reasoning|thinking|thought) steps:[\s\S]*?)(?=\n\n[A-Z]|$)/i;
+    
+    // Additional patterns for common thinking expressions
+    const thinkingPhrasesRegex = /(?:^|\n)(Let me think|Let me consider|Let me analyze|Let me reason|I think|I believe|I consider|I analyze|I reason|My analysis|My reasoning|My thought|My consideration|In my opinion|From my perspective|As I see it|It seems to me|I would say|I would argue|I would suggest|I would recommend|I would propose|I would conclude|I would decide|I would choose|I would determine|I would resolve|I would judge|I would weigh|I would scrutinize|I would inspect|I would investigate|I would explore|I would probe|I would research|I would study|I would examine|I would deliberate|I would debate|I would discuss|I would argue|I would reason|I would logic|I would rationale|I would process|I would workout|I would figureout)[\s\S]*?(?=\n\n|\n[A-Z]|\nI |\nThe |\nYou |\nThis |$)/gi;
+    
+    // Pattern for internal monologue style thinking
+    const internalMonologueRegex = /(?:^|\n)([A-Z][a-z]+ [a-z]+ to [a-z]+|I need to [a-z]+|I should [a-z]+|I want to [a-z]+|I must [a-z]+|I ought to [a-z]+|My goal is to [a-z]+|My objective is to [a-z]+|My aim is to [a-z]+|I plan to [a-z]+|I intend to [a-z]+|I wish to [a-z]+)[\s\S]*?(?=\n\n|\n[A-Z]|\nI |\nThe |\nYou |\nThis |$)/g;
+    
+    let thoughts = [];
+    let match;
+    
+    // Extract tagged thinking content
+    while ((match = thoughtRegex.exec(content)) !== null) {
+        thoughts.push(match[0].trim());
+    }
+    
+    // Extract untagged thinking content
+    while ((match = untaggedThinkingRegex.exec(content)) !== null) {
+        const alreadyExtracted = thoughts.some(thought => thought.includes(match[0]));
+        if (!alreadyExtracted && match[0].trim().length > 10) {
+            thoughts.push(match[0].trim());
+        }
+    }
+    
+    // Extract thinking phrases content
+    while ((match = thinkingPhrasesRegex.exec(content)) !== null) {
+        const alreadyExtracted = thoughts.some(thought => thought.includes(match[0]));
+        if (!alreadyExtracted && match[0].trim().length > 10) {
+            thoughts.push(match[0].trim());
+        }
+    }
+    
+    // Extract internal monologue style thinking
+    while ((match = internalMonologueRegex.exec(content)) !== null) {
+        const alreadyExtracted = thoughts.some(thought => thought.includes(match[0]));
+        if (!alreadyExtracted && match[0].trim().length > 10) {
+            thoughts.push(match[0].trim());
+        }
+    }
+    
+    // Extract reasoning prefix if present
+    const reasoningMatch = content.match(reasoningPrefixRegex);
+    if (reasoningMatch) {
+        thoughts.push(reasoningMatch[1].trim());
+    }
+    
+    // Extract first person conflict sections
+    const conflictIndex = content.indexOf('I need to be careful not to show the user my thinking process');
+    if (conflictIndex !== -1) {
+        const potentialAnswer = content.substring(0, conflictIndex).trim();
+        const potentialThinking = content.substring(conflictIndex).trim();
+        if (potentialAnswer.length > 20 && potentialThinking.length > 10 &&
+            !potentialThinking.includes('I ') && !potentialThinking.includes('my ') && !potentialThinking.includes('me ') &&
+            (potentialThinking.includes('user') || potentialThinking.includes('system') ||
+             potentialThinking.includes('conflict') || potentialThinking.includes('think') ||
+             potentialThinking.includes('reasoning') || potentialThinking.includes('prompt') ||
+             potentialThinking.includes('instruction') || potentialThinking.includes('task') ||
+             potentialThinking.includes('perspective') || potentialThinking.includes('setting') ||
+             potentialThinking.includes('lighting') || potentialThinking.includes('photo') ||
+             potentialThinking.includes('detailed') || potentialThinking.includes('photorealistic') ||
+             potentialThinking.includes('consider') || potentialThinking.includes('analyze') ||
+             potentialThinking.includes('evaluate') || potentialThinking.includes('assess'))) {
+            thoughts.push(potentialThinking);
+        }
+    }
+    
+    // Pattern for "Let me think" style content
+    const letMeThinkIndex = content.search(/(?:^|\n)(Let me (think|consider|analyze|reason|plan|evaluate|assess|examine|review|study|investigate|explore|ponder|deliberate|debate|discuss|argue|reason|logic|rationale|process|workout|figureout))/i);
+    if (letMeThinkIndex !== -1) {
+        const letMeThinkEnd = content.indexOf('\n\n', letMeThinkIndex);
+        const letMeThinkContent = letMeThinkEnd !== -1 ? 
+            content.substring(letMeThinkIndex, letMeThinkEnd).trim() : 
+            content.substring(letMeThinkIndex).trim();
+        if (letMeThinkContent.length > 20) {
+            thoughts.push(letMeThinkContent);
+        }
+    }
+    
+    // Pattern for numbered thinking steps
+    const numberedStepsPattern = /^([\s\S]*?)(\n\n[A-Z][^.]*[.!?]\s*[A-Z][^.]*[.!?][\s\S]*)$/;
+    const numberedStepsMatch = content.match(numberedStepsPattern);
+    if (numberedStepsMatch && numberedStepsMatch[1].length > 30 && 
+        (numberedStepsMatch[1].match(/\d+\.\s/g) || []).length >= 2) {
+        // Check if the second part looks like a final response
+        const finalResponse = numberedStepsMatch[2].trim();
+        if (finalResponse.length > 10 && 
+            (finalResponse.includes('!') || finalResponse.includes('?') || finalResponse.includes('😊') || finalResponse.includes('🤠') ||
+             finalResponse.includes('👋') || finalResponse.includes('😉') || finalResponse.includes('😄') || finalResponse.includes('😁') ||
+             finalResponse.includes('Here') || finalResponse.includes('Based') || finalResponse.includes('Therefore') || finalResponse.includes('Conclusion'))) {
+            thoughts.push(numberedStepsMatch[1].trim());
+        }
+    }
+    
+    // New pattern: Extract narrative thinking content that precedes the final response
+    // This handles cases where the AI writes out its thinking process in a narrative format
+    const narrativeThinkingPattern = /^([\s\S]*?)(\n\n[A-Z][^.]*[.!?]\s*[A-Z][^.]*[.!?][\s\S]*)$/;
+    const narrativeMatch = content.match(narrativeThinkingPattern);
+    if (narrativeMatch && narrativeMatch[1].length > 50 && 
+        (narrativeMatch[1].includes('should') || narrativeMatch[1].includes('need to') || 
+         narrativeMatch[1].includes('want to') || narrativeMatch[1].includes('going to') ||
+         narrativeMatch[1].includes('I ') || narrativeMatch[1].includes('my ') || 
+         narrativeMatch[1].includes('consider') || narrativeMatch[1].includes('think') ||
+         narrativeMatch[1].includes('analyze') || narrativeMatch[1].includes('evaluate'))) {
+        // Check if the second part looks like a final response
+        const finalResponse = narrativeMatch[2].trim();
+        if (finalResponse.length > 10 && 
+            (finalResponse.includes('!') || finalResponse.includes('?') || finalResponse.includes('😊') || finalResponse.includes('🤠') ||
+             finalResponse.includes('👋') || finalResponse.includes('😉') || finalResponse.includes('😄') || finalResponse.includes('😁') ||
+             finalResponse.includes('Here') || finalResponse.includes('Based') || finalResponse.includes('Therefore') || finalResponse.includes('Conclusion'))) {
+            thoughts.push(narrativeMatch[1].trim());
+        }
+    }
+    
+    // Additional pattern: Handle cases where the thinking content is separated by a single newline
+    const singleNewlinePattern = /^([\s\S]*?)(\n[A-Z][^.]*[.!?]\s*[A-Z][^.]*[.!?][\s\S]*)$/;
+    const singleNewlineMatch = content.match(singleNewlinePattern);
+    if (singleNewlineMatch && singleNewlineMatch[1].length > 50 && 
+        !thoughts.some(thought => thought.includes(singleNewlineMatch[1])) && // Avoid duplicates
+        (singleNewlineMatch[1].includes('should') || singleNewlineMatch[1].includes('need to') || 
+         singleNewlineMatch[1].includes('want to') || singleNewlineMatch[1].includes('going to') ||
+         singleNewlineMatch[1].includes('I ') || singleNewlineMatch[1].includes('my ') ||
+         singleNewlineMatch[1].includes('consider') || singleNewlineMatch[1].includes('think') ||
+         singleNewlineMatch[1].includes('analyze') || singleNewlineMatch[1].includes('evaluate'))) {
+        // Check if the second part looks like a final response
+        const finalResponse = singleNewlineMatch[2].trim();
+        if (finalResponse.length > 10 && 
+            (finalResponse.includes('!') || finalResponse.includes('?') || finalResponse.includes('😊') || finalResponse.includes('🤠') ||
+             finalResponse.includes('👋') || finalResponse.includes('😉') || finalResponse.includes('😄') || finalResponse.includes('😁') ||
+             finalResponse.includes('Here') || finalResponse.includes('Based') || finalResponse.includes('Therefore') || finalResponse.includes('Conclusion'))) {
+            thoughts.push(singleNewlineMatch[1].trim());
+        }
+    }
+    
+    // Pattern for JSON thinking content
+    const jsonThinkingPattern = /^([\s\S]*?)\n*(```json\n\{[\s\S]*?\n\}```)([\s\S]*)$/;
+    const jsonThinkingMatch = content.match(jsonThinkingPattern);
+    if (jsonThinkingMatch && jsonThinkingMatch[1].length > 20) {
+        thoughts.push(jsonThinkingMatch[1].trim());
+    }
+    
+    // Clean the answer by removing all thinking content
+    let cleanedAnswer = content;
+    for (const thought of thoughts) {
+        cleanedAnswer = cleanedAnswer.replace(thought, '');
+    }
+    
+    // Remove empty thinking tags
+    cleanedAnswer = cleanedAnswer.replace(thoughtRegex, '').trim();
+    
+    // Remove thinking phrases
+    cleanedAnswer = cleanedAnswer.replace(thinkingPhrasesRegex, '').trim();
+    
+    // Remove internal monologue patterns
+    cleanedAnswer = cleanedAnswer.replace(internalMonologueRegex, '').trim();
+    
+    // Clean up excessive newlines
+    cleanedAnswer = cleanedAnswer.replace(/\n{3,}/g, '\n\n').trim();
+    
+    // Additional cleanup for common artifacts
+    cleanedAnswer = cleanedAnswer.replace(/\n{2,}(Let me think|Let me consider|Let me analyze|Let me reason)/gi, '').trim();
+    cleanedAnswer = cleanedAnswer.replace(/^[\s\n]*(Let me think|Let me consider|Let me analyze|Let me reason)[\s\S]*?\n\n/mi, '').trim();
+    
+    // Extract JSON if present at the end of the answer
+    const startBraceIndex = cleanedAnswer.indexOf('{');
+    const endBraceIndex = cleanedAnswer.lastIndexOf('}');
+    
+    if (startBraceIndex !== -1 && endBraceIndex > startBraceIndex) {
+        const potentialJson = cleanedAnswer.substring(startBraceIndex, endBraceIndex + 1);
+        try {
+            JSON.parse(potentialJson);
+            cleanedAnswer = potentialJson;
+        } catch (e) {
+            // Not valid JSON, keep as is
+        }
+    }
+    
+    // Additional pattern: Extract thinking content that appears after the main response
+    const postResponseThinkingPattern = /(\n\n[A-Z][^.]*[.!?]\s*[A-Z][^.]*[.!?][\s\S]*?)([\s\S]*?(?:think|consider|analyze|reason|plan|evaluate|assess|examine|review|study|investigate|explore|ponder|deliberate|debate|discuss|argue|logic|rationale|process|workout|figureout)[\s\S]*)$/i;
+    const postResponseMatch = cleanedAnswer.match(postResponseThinkingPattern);
+    if (postResponseMatch && postResponseMatch[2].length > 30) {
+        thoughts.push(postResponseMatch[2].trim());
+        cleanedAnswer = postResponseMatch[1].trim();
+    }
+    
+    // Join all extracted thinking content
+    const extractedThinking = thoughts.join('\n\n');
+    
+    // Final cleanup of the answer
+    cleanedAnswer = cleanedAnswer.trim();
+    
+    // Remove any remaining thinking-related artifacts
+    cleanedAnswer = cleanedAnswer.replace(/\n\s*\n\s*\n/g, '\n\n').trim();
     
     return { cleanedAnswer, extractedThinking };
 }
@@ -391,7 +585,8 @@ async function handleTogetherRequest(payload, apiKeys) {
             max_tokens: payload.outputReservation,
         }, { headers: { 'Authorization': `Bearer ${apiKey}` } });
         const choice = response.data.choices[0];
-        const { cleanedAnswer, extractedThinking } = extractAndCleanThought(choice.message.content);
+        const rawContent = choice.message.content;
+        const { cleanedAnswer, extractedThinking } = extractAndCleanThought(rawContent);
         
         return { success: true, answer: cleanedAnswer, thinking: extractedThinking };
     } catch (error) { 

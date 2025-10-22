@@ -36,7 +36,7 @@ ${result.error}`, 'ai');
         } else {
             if (result.answer && result.answer.trim()) {
                 state.lastThinkingOutput = result.thinking || '';
-                               addMessage(result.answer, 'ai', null, false);
+                addMessage(result.answer, 'ai', null, false, result.thinking || '');
                 state.conversationHistory.push({
                     role: 'assistant',
                     content: result.answer,

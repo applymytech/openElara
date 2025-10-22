@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Final Fix</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.8/purify.min.js"></script>
+    <style>
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .user-message {
+            background-color: #e3f2fd;
+        }
+        .assistant-message {
+            background-color: #f5f5f5;
+        }
+        .thinking-indicator {
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        .thinking-link {
+            color: #1976d2;
+            text-decoration: none;
+        }
+        .thinking-link:hover {
+            text-decoration: underline;
+        }
+        #thinking-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+            width: 80%;
+            max-width: 800px;
+        }
+        .modal-textarea {
+            width: 100%;
+            min-height: 300px;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            white-space: pre-wrap;
+            font-family: monospace;
+            overflow: auto;
+        }
+        .hidden {
+            display: none;
+        }
+        #chat-history {
+            max-width: 800px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Final Fix</h1>
+    <div id="chat-history"></div>
+    
+    <div id="thinking-modal" class="hidden">
+        <div class="modal-content">
+            <h3>AI Thought Process</h3>
+            <div id="thinking-content" class="modal-textarea">Loading...</div>
+            <div class="modal-buttons">
+                <button id="close-thinking-btn">Close</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Mock state object
+        const state = {
+            lastThinkingOutput: ''
+        };
+        
+        // Mock handleThinkingModal
+        const handleThinkingModal = {
+            showThinking: function(state) {
+                const modal = document.getElementById('thinking-modal');
+                const content = document.getElementById('thinking-content');
+                if (modal && content) {
+                    if (state.lastThinkingOutput && state.lastThinkingOutput.length > 0) {
+                        const formattedThinking = state.lastThinkingOutput
+                            .replace(/\\n/g, '\n')
+                            .replace(/\\t/g, '\t');
+                        content.textContent = formattedThinking;
+                    } else {
+                        content.textContent = "No thinking process available.";
+                    }
+                    modal.classList.remove('hidden');
+                }
+            },
+            closeModal: function() {
+                const modal = document.getElementById('thinking-modal');
+                if (modal) {
+                    modal.classList.add('hidden');
+                }
+            }
+        };
+        
+        // Implementation of the addMessageToHistory function
+        window.addMessageToHistory = (role, content, thinking) => {
+            const chatHistory = document.getElementById('chat-history');
+            if (!chatHistory) return;
+            
+            const cleanContent = DOMPurify.sanitize(marked.parse(content || ''));
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', `${role}-message`);
+            
+            // Store thinking content for the modal
+            if (thinking && thinking.length > 0) {
+                state.lastThinkingOutput = thinking;
+            }
+            
+            // Show the "View Thinking Process" link only for assistant messages with thinking content
+            if (role === 'assistant' && thinking && thinking.length > 0) {
+                messageDiv.innerHTML = `
+                    <span class="message-content">${cleanContent}</span>
+                    <div class="thinking-indicator">
+                        <a href="#" class="thinking-link" onclick="handleThinkingModal.showThinking(window.state); return false;">View Thinking Process</a>
+                    </div>
+                `;
+            } else {
+                messageDiv.innerHTML = `<span class="message-content">${cleanContent}</span>`;
+                // Clear thinking output for assistant messages without thinking content
+                if (role === 'assistant' && (!thinking || thinking.length === 0)) {
+                    state.lastThinkingOutput = '';
+                }
+            }
+            
+            chatHistory.appendChild(messageDiv);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        };
+        
+        // Set up event listener for close button
+        document.getElementById('close-thinking-btn').addEventListener('click', function() {
+            handleThinkingModal.closeModal();
+        });
+        
+        // Test with the exact example from the user
+        window.onload = function() {
+            const rawContent = `Okay, the user sent "Howdy ". They're greeting me, so I should respond in a friendly manner. Looking at the conversation history, I see they've asked about my thinking process before. They might be testing how I handle different greetings or just starting a new topic.
+I should keep the response warm and engaging. Maybe add an emoji to keep it light. I want to show I'm approachable and ready to help with whatever they need next. So, I'll say something like, "Hey Andy! Howdy back at ya! What brings you here today?" and add a friendly emoji.
+
+Hey Andy! Howdy back at ya! What brings you here today? 🤠😊`;
+            
+            const cleanedAnswer = "Hey Andy! Howdy back at ya! What brings you here today? 🤠😊";
+            
+            // This simulates what the backend should do:
+            // 1. Extract thinking content and clean the answer
+            // 2. Return both the cleaned answer and the raw content for the thinking modal
+            
+            // Call addMessageToHistory with the cleaned answer and raw content
+            window.addMessageToHistory('assistant', cleanedAnswer, rawContent);
+            
+            const results = document.getElementById('chat-history');
+            results.innerHTML += `
+                <h2>Test Result:</h2>
+                <p>The chat history should show only: "Hey Andy! Howdy back at ya! What brings you here today? 🤠😊"</p>
+                <p>The thinking modal should show the full raw content when the "View Thinking Process" link is clicked.</p>
+            `;
+        };
+    </script>
+</body>
+</html>

@@ -236,12 +236,26 @@ window.addMessageToHistory = (role, content, thinking) => {
 
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', `${role}-message`);
-    messageDiv.innerHTML = `<span class="message-content">${cleanContent}</span>`;
     
+    // Store thinking content for the modal
     if (thinking && thinking.length > 0) {
         state.lastThinkingOutput = thinking;
-    } else if (role === 'assistant' && thinking === undefined) {
-        state.lastThinkingOutput = '';
+    }
+    
+    // Show the "View Thinking Process" link only for assistant messages with thinking content
+    if (role === 'assistant' && thinking && thinking.length > 0) {
+        messageDiv.innerHTML = `
+            <span class="message-content">${cleanContent}</span>
+            <div class="thinking-indicator">
+                <a href="#" class="thinking-link" onclick="handleThinkingModal.showThinking(window.state); return false;">View Thinking Process</a>
+            </div>
+        `;
+    } else {
+        messageDiv.innerHTML = `<span class="message-content">${cleanContent}</span>`;
+        // Clear thinking output for assistant messages without thinking content
+        if (role === 'assistant' && (!thinking || thinking.length === 0)) {
+            state.lastThinkingOutput = '';
+        }
     }
 
     chatHistory.appendChild(messageDiv);
@@ -404,12 +418,12 @@ window.handleExaTaskResponse = async (result, thinkingMessageElement) => {
             content = "Web task completed successfully but returned no relevant data/answer.";
         }
         
-        window.addMessageToHistory('ai', content, result.thinking);
+        window.addMessageToHistory('assistant', content, result.thinking);
         state.conversationHistory.push({ role: 'assistant', content: content });
         
     } else {
         const errorContent = `**Web Task Failed:** ${result.error || 'An unknown error occurred.'}`;
-        window.addMessageToHistory('ai', errorContent);
+        window.addMessageToHistory('assistant', errorContent, null);
     }
     state.isSending = false;
    };
